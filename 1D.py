@@ -72,7 +72,7 @@ def plot(psi0,name):
 def plot_sym(nu):
     psi0  = grey_soliton(nu,-10)
     psi0 *= grey_soliton(-nu, 10)
-    plot(psi0,'nu{}.svg'.format(nu))
+    plot(psi0,'nu{}.pdf'.format(nu))
 
 def main():
     plot_sym(0.3)
@@ -84,7 +84,7 @@ def main():
     psi0 *= grey_soliton(-0.05,   -2)
     psi0 *= grey_soliton( 0.967746031217134,  6)
 
-    plot(psi0,'nu0.3nu0.05.svg')
+    plot(psi0,'nu0.3nu0.05.pdf')
 
 if __name__ == "__main__":
     main()
