@@ -2,4 +2,5 @@
 .ipynb_checkpoints
 *.svg
 *.pdf
-
+data
+plots

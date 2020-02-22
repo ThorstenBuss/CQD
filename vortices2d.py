@@ -219,15 +219,36 @@ def create_2d_test_vortexpair_grid(nx_grid,ny_grid,num_vortex_pairs,N,g):
 
     return grid
 
+def TimeEvolution(psi0, g, tsteps_, dt_=dt):
+    k = 2*np.pi*np.fft.fftfreq(len(psi0),d=dx)
+    k = np.meshgrid(k,k)
+    H1 = (k[0]*k[0]+k[1]*k[1])/2
+    t = 0
+    psi = np.exp(-1j*(dt_/2)*g*np.conjugate(psi0)*psi0)*psi0
+    t += dt_/2
+    for i in range(tsteps_):
+        psi_ = np.fft.fft2(psi)
+        psi_ = np.exp(-1j*dt_*H1)*psi_
+        t += dt_/2
+        psi  = np.fft.ifft2(psi_)
+        psi  = np.exp(-1j*dt_*g*np.conjugate(psi)*psi)*psi
+        t += dt_/2
+    psi_ = np.fft.fft2(psi)
+    psi_ = np.exp(-1j*dt*H1)*psi_
+    t += dt/2
+    psi  = np.fft.ifft2(psi_)
+    psi  = np.exp(-1j*(dt/2)*g*np.conjugate(psi)*psi)*psi
+    return psi
+
 #######################################################
 #### Main program to initialize a vortex grid #########
 #######################################################
 def main(argv):
     
     do_test_vortexpair_grid = False      ### if True initial grid will be vortice on fixed positions for testing
-    do_random_vortexpair_grid = False      ### if True initial grid will be vortex grid with an equal number of vortices and antivortices placed at random positions
-    do_random_vortex_grid = False         ### if True initial grid will be vortex grid composed of vortices with equal quantization placed at random positions
-    do_regular_vortex_grid = True        ### if True initial grid will be regular vortex grid, i.e. equal distances between vortices and antivortices
+    do_random_vortexpair_grid = False    ### if True initial grid will be vortex grid with an equal number of vortices and antivortices placed at random positions
+    do_random_vortex_grid = True         ### if True initial grid will be vortex grid composed of vortices with equal quantization placed at random positions
+    do_regular_vortex_grid = False       ### if True initial grid will be regular vortex grid, i.e. equal distances between vortices and antivortices
     
     nx_grid = 64    ### number of grid points in x-direction
     ny_grid = 64    ### number of grid points in y-direction
