@@ -71,9 +71,13 @@ def plot(psi0, name, tsteps_, dt_=dt):
 def plot_sym(nu):
     psi0  = grey_soliton(nu,-10)
     psi0 *= grey_soliton(-nu, 10)
-    plot(psi0,'nu{}.svg'.format(nu),tsteps_=int(20/(nu*dt)))
+    plot(psi0,'nu{}.png'.format(nu),tsteps_=int(20/(nu*dt)))
 
 def main():
+    psi0  = dark_soliton(-10)
+    psi0 *= dark_soliton( 10)
+    plot(psi0,'nu0.0.png',100)
+
     plot_sym(0.3)
     plot_sym(0.5)
     plot_sym(0.8)
@@ -83,7 +87,7 @@ def main():
     psi0 *= grey_soliton(-0.05,   -2)
     psi0 *= grey_soliton( 0.967746031217134,  6)
 
-    plot(psi0,'nu0.3nu0.05.svg',10000,dt/2)
+    plot(psi0,'nu0.3nu0.05.png',10000,dt/2)
 
 if __name__ == "__main__":
     main()
