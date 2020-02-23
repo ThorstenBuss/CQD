@@ -110,7 +110,7 @@ def add_2d_vortex_simple_n(grid, x_pos, y_pos, n, N, g):
 def add_2d_vortex(grid, x_pos, y_pos, n, N, g):
 
     grid_h = grid
-    if((int) (np.sqrt(n*n)) == 1):
+    if n*n == 1:
 
         print("Only single quantized vortices")
         
@@ -155,7 +155,6 @@ def create_2d_random_vortexpair_grid(nx_grid,ny_grid,num_vortex_pairs,N,g):
     grid = create_condensed_grid(nx_grid, ny_grid,N)
 
     for i in np.arange(0,num_vortex_pairs):
-
         grid = add_2d_vortex(grid, nx_grid*np.random.random(), ny_grid*np.random.random(), 1, N ,g)
         grid = add_2d_vortex(grid, nx_grid*np.random.random(), ny_grid*np.random.random(), -1, N ,g)
 
@@ -167,7 +166,6 @@ def create_2d_random_vortex_grid(nx_grid,ny_grid,num_vortices,n,N,g):
     grid = create_condensed_grid(nx_grid, ny_grid,N)
 
     for i in np.arange(0,num_vortices):
-
         grid = add_2d_vortex(grid, nx_grid*np.random.random(), ny_grid*np.random.random(), n, N ,g)
 
     return grid
@@ -188,8 +186,8 @@ def create_2d_regular_vortex_grid(nx_grid,ny_grid,lx,ly,n,N,g):
 
     grid = create_condensed_grid(nx_grid, ny_grid,N)
 
-    dist_x = 1.*nx_grid/lx
-    dist_y = 1.*ny_grid/ly
+    dist_x = nx_grid/lx
+    dist_y = ny_grid/ly
 
     print(dist_x)
     offset  = 0.
@@ -219,7 +217,7 @@ def create_2d_test_vortexpair_grid(nx_grid,ny_grid,num_vortex_pairs,N,g):
 
     return grid
 
-def TimeEvolution(psi0, g, tsteps_, dt_=dt):
+def TimeEvolution(psi0, g, tsteps_, dt_,dx):
     k = 2*np.pi*np.fft.fftfreq(len(psi0),d=dx)
     k = np.meshgrid(k,k)
     H1 = (k[0]*k[0]+k[1]*k[1])/2
@@ -234,63 +232,13 @@ def TimeEvolution(psi0, g, tsteps_, dt_=dt):
         psi  = np.exp(-1j*dt_*g*np.conjugate(psi)*psi)*psi
         t += dt_/2
     psi_ = np.fft.fft2(psi)
-    psi_ = np.exp(-1j*dt*H1)*psi_
-    t += dt/2
+    psi_ = np.exp(-1j*dt_*H1)*psi_
+    t += dt_/2
     psi  = np.fft.ifft2(psi_)
-    psi  = np.exp(-1j*(dt/2)*g*np.conjugate(psi)*psi)*psi
+    psi  = np.exp(-1j*(dt_/2)*g*np.conjugate(psi)*psi)*psi
     return psi
 
-#######################################################
-#### Main program to initialize a vortex grid #########
-#######################################################
-def main(argv):
-    
-    do_test_vortexpair_grid = False      ### if True initial grid will be vortice on fixed positions for testing
-    do_random_vortexpair_grid = False    ### if True initial grid will be vortex grid with an equal number of vortices and antivortices placed at random positions
-    do_random_vortex_grid = True         ### if True initial grid will be vortex grid composed of vortices with equal quantization placed at random positions
-    do_regular_vortex_grid = False       ### if True initial grid will be regular vortex grid, i.e. equal distances between vortices and antivortices
-    
-    nx_grid = 64    ### number of grid points in x-direction
-    ny_grid = 64    ### number of grid points in y-direction
-
-    xi = 4          ### healing length, resolved with 4 grid points, if you use a small grid you can go down to 2 grid points
-    g = 1e-2        ### non-linear GPE coupling
-    rho = 1./(2*g*xi**2)    ### homogeneous background density
-    print("Homogeneous background density:" , rho)
-    
-    N = rho*nx_grid*ny_grid   ### total particle number of simulation
-    print("Particle number: " , N)
-
-    if(do_test_vortexpair_grid):
-
-        num_vortex_pairs = 1     ### number of vortex pairs with quantization n = +-1 
-        grid = create_2d_test_vortexpair_grid(nx_grid,ny_grid, num_vortex_pairs, N,g)
-
-    if(do_random_vortexpair_grid):
-
-        num_vortex_pairs = 5     ### number of vortex pairs with quantization n = +-1 
-        grid = create_2d_random_vortexpair_grid(nx_grid,ny_grid, num_vortex_pairs, N,g)
-
-    if(do_random_vortex_grid):
-
-        num_vortices = 10     ### total number of vortices
-        n = 2                 ### quantization of vortices
-        grid = create_2d_random_vortex_grid(nx_grid,ny_grid, num_vortices,n, N,g)
-
-    if(do_regular_vortex_grid):
-        lx = 2     ### number of vortices in x-direction on checkerboard
-        ly = 2     ### number of vortices in y-direction on checkerboard
-        n = 4      ### quantization of the vortices 
-        grid = create_2d_regular_vortex_grid(nx_grid, ny_grid, lx, ly, n, N, g)
-
-        
-    grid *= np.sqrt(1.*N/calculate_particle_number(grid))               ### normalize to initially set particle number
-    print("Particle number on created vortex grid: " , calculate_particle_number(grid))
-
-    ############################################################################
-    #####  Visualization of the initial grid ###################################
-    ############################################################################
-    
+def plot(grid,nx_grid,ny_grid,i):
     fulllengthy = ny_grid
     factory = 8.
     stepsy = (int)(fulllengthy/factory)
@@ -326,8 +274,8 @@ def main(argv):
 
 
     plt.gcf().subplots_adjust(bottom=0.2)
-    fig.tight_layout(rect=[0.05, 0.05, 1, 1])
-    #plt.show()
+    plt.savefig('plots/density1/{}.png'.format(i),bbox_inches='tight')
+    plt.close()
 
 
     #### Phase ########################################
@@ -350,9 +298,62 @@ def main(argv):
 
 
     plt.gcf().subplots_adjust(bottom=0.2)
-    fig.tight_layout(rect=[0.05, 0.05, 1, 1])
-    plt.show()
+    plt.savefig('plots/phase1/{}.png'.format(i),bbox_inches='tight')
+    plt.close()
+
+
+#######################################################
+#### Main program to initialize a vortex grid #########
+#######################################################
+def main(argv):
     
+    do_test_vortexpair_grid = False      ### if True initial grid will be vortice on fixed positions for testing
+    do_random_vortexpair_grid = False    ### if True initial grid will be vortex grid with an equal number of vortices and antivortices placed at random positions
+    do_random_vortex_grid = False        ### if True initial grid will be vortex grid composed of vortices with equal quantization placed at random positions
+    do_regular_vortex_grid = True        ### if True initial grid will be regular vortex grid, i.e. equal distances between vortices and antivortices
     
+    nx_grid = 64    ### number of grid points in x-direction
+    ny_grid = 64    ### number of grid points in y-direction
+
+    xi = 4          ### healing length, resolved with 4 grid points, if you use a small grid you can go down to 2 grid points
+    g = 1e-2        ### non-linear GPE coupling
+    rho = 1./(2*g*xi**2)    ### homogeneous background density
+    print("Homogeneous background density:" , rho)
+    
+    N = rho*nx_grid*ny_grid   ### total particle number of simulation
+    print("Particle number: " , N)
+
+    if(do_test_vortexpair_grid):
+
+        num_vortex_pairs = 1     ### number of vortex pairs with quantization n = +-1 
+        grid = create_2d_test_vortexpair_grid(nx_grid,ny_grid, num_vortex_pairs, N,g)
+
+    if(do_random_vortexpair_grid):
+
+        num_vortex_pairs = 5     ### number of vortex pairs with quantization n = +-1 
+        grid = create_2d_random_vortexpair_grid(nx_grid,ny_grid, num_vortex_pairs, N,g)
+
+    if(do_random_vortex_grid):
+
+        num_vortices = 10     ### total number of vortices
+        n = 2                 ### quantization of vortices
+        grid = create_2d_random_vortex_grid(nx_grid,ny_grid, num_vortices,n, N,g)
+
+    if(do_regular_vortex_grid):
+        lx = 4     ### number of vortices in x-direction on checkerboard
+        ly = 4     ### number of vortices in y-direction on checkerboard
+        n = 4      ### quantization of the vortices 
+        grid = create_2d_regular_vortex_grid(nx_grid, ny_grid, lx, ly, n, N, g)
+
+        
+    grid *= np.sqrt(1.*N/calculate_particle_number(grid))               ### normalize to initially set particle number
+    print("Particle number on created vortex grid: " , calculate_particle_number(grid))
+
+    plot(grid,nx_grid,ny_grid,0)
+    for i in range(1000):
+        grid = TimeEvolution(grid, g, 20, 0.0005,1/xi)
+        plot(grid,nx_grid,ny_grid,i)
+
+
 if __name__=='__main__':
     main(sys.argv)
