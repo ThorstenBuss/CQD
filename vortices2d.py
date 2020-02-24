@@ -355,7 +355,7 @@ def main(argv):
     plot(grid,nx_grid,ny_grid,0)
     for i in tqdm(range(500)):
         grid = TimeEvolution(grid, g, 5, 0.002,1/xi)
-        plot(grid,nx_grid,ny_grid,i)
+        plot(grid,nx_grid,ny_grid,i+1)
 
 
 if __name__=='__main__':
