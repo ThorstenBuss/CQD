@@ -38,7 +38,6 @@ rc('legend', fontsize=9.0)
 
 ### create a grid with homogeneous condensate background density
 def create_condensed_grid(nx_grid,ny_grid,N):
-
     grid = np.zeros((nx_grid,ny_grid), 'complex')  ## initialize grid in Fourier space
 
     grid[0,0] = np.sqrt(N/2.) + 1j*np.sqrt(N/2.)  ## fill condensate mode k=0 with all particles
@@ -50,26 +49,18 @@ def create_condensed_grid(nx_grid,ny_grid,N):
 
 ### calculate the total number of particles on the grid
 def calculate_particle_number(grid):
-
     return np.sum(np.sum(np.abs(grid)**2,axis=0), axis=0)
 
 
 ###### Vortex with winding number n = +- 1
 def add_2d_vortex_simple(grid, x_pos, y_pos, n, N, g):
-    
-    print(x_pos,y_pos)
-
     grid_h = grid
     
     f0 = np.sqrt(1.*N/(grid.shape[0]*grid.shape[1]))
-    #print f0**2
     xi = 1./(2*f0*np.sqrt(g))
-    #print xi
     
     for x2 in np.arange(0,grid.shape[0]):
-        
         for y2 in np.arange(0,grid.shape[1]):
-            
             rho = x_pos-x2 + 1j*n*(y_pos-y2)        ### shape of the vortex, rho = 0 at the core, i.e. if x_pos = x2 and y_pos = y2
             grid_h[x2,y2] *= (1.0/ xi / np.sqrt(2. + np.abs(rho)**2/xi/xi)) * rho    #### multiply homogeneous background field with shape of vortex    
         
@@ -77,21 +68,16 @@ def add_2d_vortex_simple(grid, x_pos, y_pos, n, N, g):
 
 ##### Vortex with winding number n  
 def add_2d_vortex_simple_n(grid, x_pos, y_pos, n, N, g):
-
     grid_h = grid
     
     f0 = np.sqrt(1.*N/(grid.shape[0]*grid.shape[1]))
-    #print f0**2
     xi = 1./(2*f0*np.sqrt(g))
-    #print xi
 
     sn = (int) (n/np.sqrt(n*n))
     wn = (int) (np.sqrt(n*n))
     
     for x2 in np.arange(0,grid.shape[0]):
-        
         for y2 in np.arange(0,grid.shape[1]):
-            
             rho = x_pos-x2 + 1j*sn*(y_pos-y2)
             rho *= (1.0/ xi / np.sqrt(2. + np.abs(rho)**2/xi/xi))
             rho = rho**wn
@@ -111,12 +97,8 @@ def add_2d_vortex_simple_n(grid, x_pos, y_pos, n, N, g):
 ## g : non-linear coupling
 ########################################
 def add_2d_vortex(grid, x_pos, y_pos, n, N, g):
-
     grid_h = grid
     if n*n == 1:
-
-        print("Only single quantized vortices")
-        
         grid_h = add_2d_vortex_simple(grid_h, x_pos, y_pos, n, N, g)
         ## Adding "mirror vortices" on all 8 adjacent cells to respect periodic boundaries:
         grid_h = add_2d_vortex_simple(grid_h, x_pos+grid.shape[0], y_pos, n, N, g)
@@ -129,10 +111,8 @@ def add_2d_vortex(grid, x_pos, y_pos, n, N, g):
         grid_h = add_2d_vortex_simple(grid_h, x_pos+grid.shape[0], y_pos+grid.shape[1], n, N, g)
 
     else:
-
-        print("Vortices with higher quantization")
-        
         grid_h = add_2d_vortex_simple_n(grid_h, x_pos, y_pos, n, N,g)
+        ## Adding "mirror vortices" on all 8 adjacent cells to respect periodic boundaries:
         grid_h = add_2d_vortex_simple_n(grid_h, x_pos+grid.shape[0], y_pos, n, N,g)
         grid_h = add_2d_vortex_simple_n(grid_h, x_pos+grid.shape[0], y_pos-grid.shape[1], n, N,g)
         grid_h = add_2d_vortex_simple_n(grid_h, x_pos, y_pos-grid.shape[1], n, N,g)
@@ -141,7 +121,6 @@ def add_2d_vortex(grid, x_pos, y_pos, n, N, g):
         grid_h = add_2d_vortex_simple_n(grid_h, x_pos-grid.shape[0], y_pos+grid.shape[1], n, N,g)
         grid_h = add_2d_vortex_simple_n(grid_h, x_pos, y_pos+grid.shape[1], n, N,g)
         grid_h = add_2d_vortex_simple_n(grid_h, x_pos+grid.shape[0], y_pos+grid.shape[1], n, N,g)
-        
     return grid_h
 
 #######################################################################################################################################
@@ -154,7 +133,6 @@ def add_2d_vortex(grid, x_pos, y_pos, n, N, g):
 ## g : non-linear coupling
 ########################################################################################################################################
 def create_2d_random_vortexpair_grid(nx_grid,ny_grid,num_vortex_pairs,N,g):
-
     grid = create_condensed_grid(nx_grid, ny_grid,N)
 
     for i in np.arange(0,num_vortex_pairs):
@@ -165,7 +143,6 @@ def create_2d_random_vortexpair_grid(nx_grid,ny_grid,num_vortex_pairs,N,g):
 
 ## function creates a grid with randomly placed n-quantized vortices, equal quantization of all vortices 
 def create_2d_random_vortex_grid(nx_grid,ny_grid,num_vortices,n,N,g):
-
     grid = create_condensed_grid(nx_grid, ny_grid,N)
 
     for i in np.arange(0,num_vortices):
@@ -191,7 +168,6 @@ def create_2d_regular_vortex_grid(nx_grid,ny_grid,lx,ly,n,N,g):
     dist_x = nx_grid/lx
     dist_y = ny_grid/ly
 
-    print(dist_x)
     offset  = 0.
     
     sy = 1
@@ -211,7 +187,6 @@ def create_2d_regular_vortex_grid_offset(nx_grid,ny_grid,lx,ly,n,N,g):
     dist_x = nx_grid/lx
     dist_y = ny_grid/ly
 
-    print(dist_x)
     offsetx  = np.random.normal(0.,.1,(lx,ly))
     offsety  = np.random.normal(0.,.1,(lx,ly))
     
@@ -228,11 +203,9 @@ def create_2d_regular_vortex_grid_offset(nx_grid,ny_grid,lx,ly,n,N,g):
 
 ## function that creates vortices perdefined positions for testing
 def create_2d_test_vortexpair_grid(nx_grid,ny_grid,num_vortex_pairs,N,g):
-
     grid = create_condensed_grid(nx_grid, ny_grid,N)
 
     for i in np.arange(0,num_vortex_pairs):
-
         grid = add_2d_vortex(grid, 32., 0., 1, N ,g)
         grid = add_2d_vortex(grid, 32., 32., -1, N ,g)
 
@@ -276,7 +249,6 @@ def plot(grid,nx_grid,ny_grid,i):
     ytick_locs = np.r_[0:maxLengthx:1j*(stepsx+1)]
     ytick_lbls = np.r_[0:stepsx*factorx:1j*(stepsx+1)]     
 
-
     ##### Density #######################################
     plt.imshow(np.abs(grid)**2,interpolation='nearest', origin='lower left', label = r'', vmin=0, vmax=10)
     cbar =  plt.colorbar()
@@ -286,9 +258,7 @@ def plot(grid,nx_grid,ny_grid,i):
     plt.savefig('plots/{}/density/{}.png'.format(dase,i),dpi=300)
     plt.close()
 
-
     #### Phase ########################################
-
     plt.imshow(np.angle(grid),interpolation='nearest', origin='lower left', label = r'', vmin=-np.pi, vmax=np.pi, cmap ='hsv')
     cbar = plt.colorbar(ticks=[-np.pi, 0, np.pi])
     cbar.ax.set_yticklabels(['$-\pi$', '0', '$\pi$'])
@@ -310,7 +280,8 @@ def main(argv):
     do_random_vortexpair_grid = False    ### if True initial grid will be vortex grid with an equal number of vortices and antivortices placed at random positions
     do_random_vortex_grid = False        ### if True initial grid will be vortex grid composed of vortices with equal quantization placed at random positions
     do_regular_vortex_grid = False       ### if True initial grid will be regular vortex grid, i.e. equal distances between vortices and antivortices
-    
+    do_regular_vortex_grid_offset = True
+
     nx_grid = 64    ### number of grid points in x-direction
     ny_grid = 64    ### number of grid points in y-direction
 
@@ -322,32 +293,30 @@ def main(argv):
     N = rho*nx_grid*ny_grid   ### total particle number of simulation
     print("Particle number: " , N)
 
-    if(do_test_vortexpair_grid):
-
+    if do_test_vortexpair_grid:
         num_vortex_pairs = 1     ### number of vortex pairs with quantization n = +-1 
         grid = create_2d_test_vortexpair_grid(nx_grid,ny_grid, num_vortex_pairs, N,g)
 
-    if(do_random_vortexpair_grid):
-
+    if do_random_vortexpair_grid:
         num_vortex_pairs = 5     ### number of vortex pairs with quantization n = +-1 
         grid = create_2d_random_vortexpair_grid(nx_grid,ny_grid, num_vortex_pairs, N,g)
 
-    if(do_random_vortex_grid):
-
+    if do_random_vortex_grid:
         num_vortices = 10     ### total number of vortices
         n = 2                 ### quantization of vortices
         grid = create_2d_random_vortex_grid(nx_grid,ny_grid, num_vortices,n, N,g)
 
-    if(do_regular_vortex_grid):
+    if do_regular_vortex_grid:
         lx = 4     ### number of vortices in x-direction on checkerboard
         ly = 4     ### number of vortices in y-direction on checkerboard
         n = 4      ### quantization of the vortices 
         grid = create_2d_regular_vortex_grid(nx_grid, ny_grid, lx, ly, n, N, g)
-
-    lx = 4     ### number of vortices in x-direction on checkerboard
-    ly = 4     ### number of vortices in y-direction on checkerboard
-    n = 4      ### quantization of the vortices 
-    grid =create_2d_regular_vortex_grid_offset(nx_grid, ny_grid, lx, ly, n, N, g)
+    
+    if do_regular_vortex_grid_offset:
+        lx = 4     ### number of vortices in x-direction on checkerboard
+        ly = 4     ### number of vortices in y-direction on checkerboard
+        n = 4      ### quantization of the vortices 
+        grid =create_2d_regular_vortex_grid_offset(nx_grid, ny_grid, lx, ly, n, N, g)
 
     grid *= np.sqrt(1.*N/calculate_particle_number(grid))               ### normalize to initially set particle number
     print("Particle number on created vortex grid: " , calculate_particle_number(grid))
