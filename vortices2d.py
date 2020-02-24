@@ -17,6 +17,7 @@ from scipy.optimize import curve_fit, newton
 from scipy.interpolate import interp1d
 import scipy.optimize as optimization
 import timeit
+import os
 from tqdm import tqdm
 
 
