@@ -34,16 +34,6 @@ def H1diag(t):
 def H2diag(t,psi):
     return np.conjugate(psi)*psi
 
-def TimeStap(psi,t):
-    psi  = np.exp(-1j*(dt/2)*H2diag(t,psi))*psi
-    t   += dt/2
-    psi_ = np.fft.fft(psi)
-    psi_ = np.exp(-1j*dt*H1diag(t))*psi_
-    t   += dt/2
-    psi  = np.fft.ifft(psi_)
-    psi  = np.exp(-1j*(dt/2)*H2diag(t,psi))*psi
-    return psi
-
 def grey_soliton(nu=0.5,z0=0):
     gamma=1/np.sqrt(1-nu**2)
     return 1j*nu+1/gamma*np.tanh((grid-z0)/(gamma))
