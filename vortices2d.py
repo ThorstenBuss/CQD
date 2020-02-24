@@ -17,10 +17,12 @@ from scipy.optimize import curve_fit, newton
 from scipy.interpolate import interp1d
 import scipy.optimize as optimization
 import timeit
+from tqdm import tqdm
 
 
 Mymarkersize = 3.5
 myfontsize = 9
+dase = 'vortices2d'
 
 from matplotlib import rc
 rc('font',**{'family':'serif','serif':['Computer Modern Roman'], 'size':myfontsize})
@@ -280,7 +282,7 @@ def plot(grid,nx_grid,ny_grid,i):
     cbar.set_label(r'Density',labelpad=5,fontsize=20)
     plt.xlabel('$x$ $[\\xi]$')
     plt.ylabel('$y$ $[\\xi]$')
-    plt.savefig('plots/test0/{}.png'.format(i),dpi=300)
+    plt.savefig('plots/{}/density/{}.png'.format(dase,i),dpi=300)
     plt.close()
 
 
@@ -292,7 +294,7 @@ def plot(grid,nx_grid,ny_grid,i):
     cbar.set_label(r'Phase angle',labelpad=5,fontsize=20)
     plt.xlabel('$x$ $[\\xi]$')
     plt.ylabel('$y$ $[\\xi]$')
-    plt.savefig('plots/test1/{}.png'.format(i),dpi=300)
+    plt.savefig('plots/{}/phase/{}.png'.format(dase,i),dpi=300)
     plt.close()
 
 
@@ -300,6 +302,8 @@ def plot(grid,nx_grid,ny_grid,i):
 #### Main program to initialize a vortex grid #########
 #######################################################
 def main(argv):
+    os.system('mkdir -p plots/{}/phase'.format(dase))
+    os.system('mkdir -p plots/{}/density'.format(dase))
     
     do_test_vortexpair_grid = False      ### if True initial grid will be vortice on fixed positions for testing
     do_random_vortexpair_grid = False    ### if True initial grid will be vortex grid with an equal number of vortices and antivortices placed at random positions
@@ -348,7 +352,7 @@ def main(argv):
     print("Particle number on created vortex grid: " , calculate_particle_number(grid))
 
     plot(grid,nx_grid,ny_grid,0)
-    for i in range(500):
+    for i in tqdm(range(500)):
         grid = TimeEvolution(grid, g, 5, 0.002,1/xi)
         plot(grid,nx_grid,ny_grid,i)
 

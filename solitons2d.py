@@ -9,8 +9,9 @@ mpl.rcParams.update(pgf_with_rc_fonts)
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+from tqdm import tqdm
 
-dase = 'hallo'
+dase = 'soliton2d'
 L       =  64
 npoints = 256
 dx      = L/npoints
@@ -123,8 +124,8 @@ def main():
 
     plot(psi,npoints,npoints,0)
     np.save('data/{}/{}'.format(dase,0), psi)
-    for i in range(1000):
-        psi = TimeEvolution(psi, 5, 0.02)
+    for i in tqdm(range(500)):
+        psi = TimeEvolution(psi, 10, 0.01)
         plot(psi,npoints,npoints,i+1)
         np.save('data/{}/{}'.format(dase,i+1), psi)
 
