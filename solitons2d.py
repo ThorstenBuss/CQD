@@ -2,7 +2,8 @@ import matplotlib as mpl
 mpl.rcParams['legend.handlelength'] = 0.5
 pgf_with_rc_fonts = {
     "font.family": "serif",
-    "font.sans-serif": ["DejaVu Sans"], # use a specific sans-serif font
+    "font.serif": [],
+    "font.sans-serif": ["DejaVu Sans"]
 }
 mpl.rcParams.update(pgf_with_rc_fonts)
 
@@ -10,6 +11,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 from tqdm import tqdm
+
+myfontsize = 9
+
+from matplotlib import rc
+rc('font',**{'family':'serif','serif':['Computer Modern Roman'], 'size':myfontsize})
+rc('text', usetex=True)
+rc('legend', fontsize=myfontsize)
 
 dase = 'soliton2d'
 L       =  64

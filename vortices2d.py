@@ -2,8 +2,8 @@ import matplotlib as mpl
 mpl.rcParams['legend.handlelength'] = 0.5
 pgf_with_rc_fonts = {
     "font.family": "serif",
-    "font.serif": [],                   # use latex default serif font
-    "font.sans-serif": ["DejaVu Sans"], # use a specific sans-serif font
+    "font.serif": [],
+    "font.sans-serif": ["DejaVu Sans"]
 }
 mpl.rcParams.update(pgf_with_rc_fonts)
 
@@ -20,15 +20,13 @@ import timeit
 import os
 from tqdm import tqdm
 
-
-Mymarkersize = 3.5
 myfontsize = 9
 dase = 'vortices2d'
 
 from matplotlib import rc
 rc('font',**{'family':'serif','serif':['Computer Modern Roman'], 'size':myfontsize})
 rc('text', usetex=True)
-rc('legend', fontsize=9.0)
+rc('legend', fontsize=myfontsize)
 
 
 #####################################################################################

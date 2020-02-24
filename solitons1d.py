@@ -2,13 +2,22 @@ import matplotlib as mpl
 mpl.rcParams['legend.handlelength'] = 0.5
 pgf_with_rc_fonts = {
     "font.family": "serif",
-    "font.sans-serif": ["DejaVu Sans"], # use a specific sans-serif font
+    "font.serif": [],
+    "font.sans-serif": ["DejaVu Sans"]
 }
 mpl.rcParams.update(pgf_with_rc_fonts)
 
 import matplotlib.pyplot as plt
 import scipy.linalg as LA
 import numpy as np
+import os
+
+myfontsize = 9
+
+from matplotlib import rc
+rc('font',**{'family':'serif','serif':['Computer Modern Roman'], 'size':myfontsize})
+rc('text', usetex=True)
+rc('legend', fontsize=myfontsize)
 
 L       =  40
 npoints = 600
@@ -61,22 +70,24 @@ def TimeEvolution(psi0, tsteps_, dt_=dt):
 def plot(psi0, name, tsteps_, dt_=dt):
     all_psis = TimeEvolution(psi0, tsteps_, dt_)
     plt.imshow(all_psis, cmap=plt.get_cmap("BuPu"), origin='lower', 
-           extent=[-L/2,L/2-dx, dt/2, (tsteps_+1/2)*dt], aspect='auto')
+           extent=[-L/2,L/2-dx, dt_/2, (tsteps_+1/2)*dt_], aspect='auto')
     plt.xlabel('$x$ $[\\xi]$')
     plt.ylabel('t')
-    plt.colorbar()
-    plt.savefig(name)
+    cbar = plt.colorbar()
+    cbar.set_label(r'Density',labelpad=5,fontsize=20)
+    plt.savefig(name,dpi=300)
     plt.close()
 
 def plot_sym(nu):
     psi0  = grey_soliton(nu,-10)
     psi0 *= grey_soliton(-nu, 10)
-    plot(psi0,'nu{}.png'.format(nu),tsteps_=int(20/(nu*dt)))
+    plot(psi0,'plots/nu{}.png'.format(nu),tsteps_=int(20/(nu*dt)))
 
 def main():
+    os.system('mkdir -p plots/{}')
     psi0  = dark_soliton(-10)
     psi0 *= dark_soliton( 10)
-    plot(psi0,'nu0.0.png',100)
+    plot(psi0,'plots/nu0.0.png',10000//2)
 
     plot_sym(0.3)
     plot_sym(0.5)
@@ -87,7 +98,7 @@ def main():
     psi0 *= grey_soliton(-0.05,   -2)
     psi0 *= grey_soliton( 0.967746031217134,  6)
 
-    plot(psi0,'nu0.3nu0.05.png',10000,dt/2)
+    plot(psi0,'plots/nu0.3nu0.05.png',10000,dt/2)
 
 if __name__ == "__main__":
     main()
