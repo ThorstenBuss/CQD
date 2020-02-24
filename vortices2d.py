@@ -183,7 +183,6 @@ def create_2d_random_vortex_grid(nx_grid,ny_grid,num_vortices,n,N,g):
 ## g : non-linear coupling
 #######################################################################################################################################################################################
 def create_2d_regular_vortex_grid(nx_grid,ny_grid,lx,ly,n,N,g):
-
     grid = create_condensed_grid(nx_grid, ny_grid,N)
 
     dist_x = nx_grid/lx
@@ -194,11 +193,30 @@ def create_2d_regular_vortex_grid(nx_grid,ny_grid,lx,ly,n,N,g):
     
     sy = 1
     for x in np.arange(1,lx+1):
-
         sx = 1
         for y in np.arange(1,ly+1):
-
             grid = add_2d_vortex(grid, dist_x*(x+offset), dist_y*(y+offset), sy*sx*n, N,g)
+            sx *= -1
+
+        sy*= -1
+
+    return grid
+
+def create_2d_regular_vortex_grid_offset(nx_grid,ny_grid,lx,ly,n,N,g):
+    grid = create_condensed_grid(nx_grid, ny_grid,N)
+
+    dist_x = nx_grid/lx
+    dist_y = ny_grid/ly
+
+    print(dist_x)
+    offsetx  = np.random.normal(0.,.1,(lx,ly))
+    offsety  = np.random.normal(0.,.1,(lx,ly))
+    
+    sy = 1
+    for x in np.arange(1,lx+1):
+        sx = 1
+        for y in np.arange(1,ly+1):
+            grid = add_2d_vortex(grid, dist_x*(x+offsetx[x-1,y-1]), dist_y*(y+offsety[x-1,y-1]), sy*sx*n, N,g)
             sx *= -1
 
         sy*= -1
@@ -212,7 +230,7 @@ def create_2d_test_vortexpair_grid(nx_grid,ny_grid,num_vortex_pairs,N,g):
 
     for i in np.arange(0,num_vortex_pairs):
 
-        #grid = add_2d_vortex(grid, 32., 0., 1, N ,g)
+        grid = add_2d_vortex(grid, 32., 0., 1, N ,g)
         grid = add_2d_vortex(grid, 32., 32., -1, N ,g)
 
     return grid
@@ -257,48 +275,24 @@ def plot(grid,nx_grid,ny_grid,i):
 
 
     ##### Density #######################################
-    fig, axes = plt.subplots(1,1,sharex=True)
-    plt.gcf().subplots_adjust(bottom=0.16)
-    fig.set_dpi(300)
-    fig.set_size_inches(5,5)
-
-    im = axes.imshow(np.abs(grid)**2,interpolation='nearest', origin='lower left', label = r'', vmin=0, vmax=(np.abs(grid)**2).max())
-
-    cax = fig.add_axes([1, 0.6, 0.015, 0.72/2.])
-    cb =  fig.colorbar(im,cax=cax,orientation='vertical')
-    cb.set_label(r'Density',labelpad=5)
-    
-
-    plt.setp(axes, xticks=xtick_locs, xticklabels=xtick_lbls.astype(int),
-             yticks=ytick_locs, yticklabels=ytick_lbls.astype(int))
-
-
-    plt.gcf().subplots_adjust(bottom=0.2)
-    plt.savefig('plots/density1/{}.png'.format(i),bbox_inches='tight')
+    plt.imshow(np.abs(grid)**2,interpolation='nearest', origin='lower left', label = r'', vmin=0, vmax=10)
+    cbar =  plt.colorbar()
+    cbar.set_label(r'Density',labelpad=5,fontsize=20)
+    plt.xlabel('$x$ $[\\xi]$')
+    plt.ylabel('$y$ $[\\xi]$')
+    plt.savefig('plots/test0/{}.png'.format(i),dpi=300)
     plt.close()
 
 
     #### Phase ########################################
-    fig, axes = plt.subplots(1,1,sharex=True)
-    plt.gcf().subplots_adjust(bottom=0.16)
-    fig.set_dpi(300)
-    fig.set_size_inches(5,5)
 
-    im = axes.imshow(np.angle(grid),interpolation='nearest', origin='lower left', label = r'', vmin=-np.pi, vmax=np.pi, cmap ='hsv')
-
-    
-    cax = fig.add_axes([1, 0.6, 0.015, 0.72/2.])
-    cbar = fig.colorbar(im,cax=cax,orientation='vertical', ticks=[-np.pi, 0, np.pi])
+    plt.imshow(np.angle(grid),interpolation='nearest', origin='lower left', label = r'', vmin=-np.pi, vmax=np.pi, cmap ='hsv')
+    cbar = plt.colorbar(ticks=[-np.pi, 0, np.pi])
     cbar.ax.set_yticklabels(['$-\pi$', '0', '$\pi$'])
     cbar.set_label(r'Phase angle',labelpad=5,fontsize=20)
-    
-
-    plt.setp(axes, xticks=xtick_locs, xticklabels=xtick_lbls.astype(int),
-             yticks=ytick_locs, yticklabels=ytick_lbls.astype(int))
-
-
-    plt.gcf().subplots_adjust(bottom=0.2)
-    plt.savefig('plots/phase1/{}.png'.format(i),bbox_inches='tight')
+    plt.xlabel('$x$ $[\\xi]$')
+    plt.ylabel('$y$ $[\\xi]$')
+    plt.savefig('plots/test1/{}.png'.format(i),dpi=300)
     plt.close()
 
 
@@ -310,7 +304,7 @@ def main(argv):
     do_test_vortexpair_grid = False      ### if True initial grid will be vortice on fixed positions for testing
     do_random_vortexpair_grid = False    ### if True initial grid will be vortex grid with an equal number of vortices and antivortices placed at random positions
     do_random_vortex_grid = False        ### if True initial grid will be vortex grid composed of vortices with equal quantization placed at random positions
-    do_regular_vortex_grid = True        ### if True initial grid will be regular vortex grid, i.e. equal distances between vortices and antivortices
+    do_regular_vortex_grid = False       ### if True initial grid will be regular vortex grid, i.e. equal distances between vortices and antivortices
     
     nx_grid = 64    ### number of grid points in x-direction
     ny_grid = 64    ### number of grid points in y-direction
@@ -345,13 +339,17 @@ def main(argv):
         n = 4      ### quantization of the vortices 
         grid = create_2d_regular_vortex_grid(nx_grid, ny_grid, lx, ly, n, N, g)
 
-        
+    lx = 4     ### number of vortices in x-direction on checkerboard
+    ly = 4     ### number of vortices in y-direction on checkerboard
+    n = 4      ### quantization of the vortices 
+    grid =create_2d_regular_vortex_grid_offset(nx_grid, ny_grid, lx, ly, n, N, g)
+
     grid *= np.sqrt(1.*N/calculate_particle_number(grid))               ### normalize to initially set particle number
     print("Particle number on created vortex grid: " , calculate_particle_number(grid))
 
     plot(grid,nx_grid,ny_grid,0)
-    for i in range(1000):
-        grid = TimeEvolution(grid, g, 20, 0.0005,1/xi)
+    for i in range(500):
+        grid = TimeEvolution(grid, g, 5, 0.002,1/xi)
         plot(grid,nx_grid,ny_grid,i)
 
 

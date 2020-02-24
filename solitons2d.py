@@ -8,11 +8,11 @@ mpl.rcParams.update(pgf_with_rc_fonts)
 
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
-dase = 'rand1/'
+dase = 'hallo'
 L       =  64
 npoints = 256
-dt      =   0.005
 dx      = L/npoints
 
 grid = np.arange(-L/2,L/2,dx,complex)
@@ -23,7 +23,7 @@ def rand1d(x):
     s = np.random.uniform(0,2*np.pi,L//4)
     for i in range(1,L//4):
         ret += np.sin(i*x*(2*np.pi)/L+s[i-1])
-    return 0.01*ret
+    return 0.02*ret
 
 
 def rand2d():
@@ -52,43 +52,81 @@ def ring(R=5,nu=-0.5):
     ret = 1j*nu+1/gamma*np.tanh((r-R)/gamma)
     return ret*np.ones((npoints,npoints))
 
-def ro(psi):
-    return np.conjugate(psi)*psi
+def plot(grid,nx_grid,ny_grid,i):
+    fulllengthy = ny_grid
+    factory = 8.
+    stepsy = (int)(fulllengthy/factory)
+    maxLengthy = (int)(ny_grid*(stepsy*factory)/fulllengthy)
 
-def TimeEvolution(psi0, tsteps_, dt_=dt):
+    xtick_locs = np.r_[0:maxLengthy:1j*(stepsy+1)]
+    xtick_lbls = np.r_[0:stepsy*factory:1j*(stepsy+1)]
+
+    fulllengthx = nx_grid
+    factorx = 8.
+    stepsx = (int)(fulllengthx/factorx)
+    maxLengthx = (int)(nx_grid*(stepsx*factorx)/fulllengthx)
+
+    ytick_locs = np.r_[0:maxLengthx:1j*(stepsx+1)]
+    ytick_lbls = np.r_[0:stepsx*factorx:1j*(stepsx+1)]     
+
+
+    ##### Density #######################################
+    plt.imshow(np.abs(grid)**2,interpolation='nearest', origin='lower left', label = r'', vmin=0, vmax=1.1)
+    cbar =  plt.colorbar()
+    cbar.set_label(r'Density',labelpad=5,fontsize=20)
+    plt.xlabel('$x$ $[\\xi]$')
+    plt.ylabel('$y$ $[\\xi]$')
+    plt.savefig('plots/{}/density/{}.png'.format(dase,i),dpi=300)
+    plt.close()
+
+
+    #### Phase ########################################
+    plt.imshow(np.angle(grid),interpolation='nearest', origin='lower left', label = r'', vmin=-np.pi, vmax=np.pi, cmap ='hsv')
+    cbar = plt.colorbar(ticks=[-np.pi, 0, np.pi])
+    cbar.ax.set_yticklabels(['$-\pi$', '0', '$\pi$'])
+    cbar.set_label(r'Phase angle',labelpad=5,fontsize=20)
+    plt.xlabel('$x$ $[\\xi]$')
+    plt.ylabel('$y$ $[\\xi]$')
+    plt.savefig('plots/{}/phase/{}.png'.format(dase,i),dpi=300)
+    plt.close()
+
+def TimeEvolution(psi0, tsteps_, dt):
     k = 2*np.pi*np.fft.fftfreq(npoints,d=dx)
     k = np.meshgrid(k,k)
     H1 = (k[0]*k[0]+k[1]*k[1])/2
     t = 0
-    psi = np.exp(-1j*(dt_/2)*ro(psi0))*psi0
-    t += dt_/2
+    psi = np.exp(-1j*(dt/2)*(np.conjugate(psi0)*psi0-1))*psi0
+    t += dt/2
     for i in range(tsteps_):
         psi_ = np.fft.fft2(psi)
-        psi_ = np.exp(-1j*dt_*H1)*psi_
-        t += dt_/2
+        psi_ = np.exp(-1j*dt*H1)*psi_
+        t += dt/2
         psi  = np.fft.ifft2(psi_)
-        psi  = np.exp(-1j*dt_*ro(psi))*psi
-        t += dt_/2
-        if i%10==0:
-            np.save('data/{}{}'.format(dase,i//10), psi)
-            plt.imshow(np.real(ro(psi)), cmap=plt.get_cmap("BuPu"), origin='lower', 
-                extent=[-L/2, L/2-dx, -L/2, L/2-dx],vmin=0, vmax=1.1)
-            plt.colorbar()
-            plt.savefig('plots/{}{}.png'.format(dase,i//10))
-            plt.close()
+        psi  = np.exp(-1j*dt*(np.conjugate(psi)*psi-1))*psi
+        t += dt/2
     psi_ = np.fft.fft2(psi)
     psi_ = np.exp(-1j*dt*H1)*psi_
     t += dt/2
     psi  = np.fft.ifft2(psi_)
-    psi  = np.exp(-1j*(dt/2)*ro(psi))*psi
+    psi  = np.exp(-1j*(dt/2)*(np.conjugate(psi)*psi-1))*psi
     return psi
 
 def main():
+    os.system('mkdir -p data/{}'.format(dase))
+    os.system('mkdir -p plots/{}/phase'.format(dase))
+    os.system('mkdir -p plots/{}/density'.format(dase))
+
     #psi = grey_soliton(0.,-10)*grey_soliton(-0.,10)
     #psi = ring()
     psi = grey_soliton_rand_pos(0.,-10)*grey_soliton_rand_pos(-0.,10)
     #psi = rand2d()*grey_soliton(0.,-10)*grey_soliton(-0.,10)
-    psi = TimeEvolution(psi, 10001, dt_=dt)
+
+    plot(psi,npoints,npoints,0)
+    np.save('data/{}/{}'.format(dase,0), psi)
+    for i in range(1000):
+        psi = TimeEvolution(psi, 5, 0.02)
+        plot(psi,npoints,npoints,i+1)
+        np.save('data/{}/{}'.format(dase,i+1), psi)
 
 if __name__ == "__main__":
     main()

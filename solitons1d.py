@@ -62,7 +62,7 @@ def plot(psi0, name, tsteps_, dt_=dt):
     all_psis = TimeEvolution(psi0, tsteps_, dt_)
     plt.imshow(all_psis, cmap=plt.get_cmap("BuPu"), origin='lower', 
            extent=[-L/2,L/2-dx, dt/2, (tsteps_+1/2)*dt], aspect='auto')
-    plt.xlabel('$x$ $[\epsilon]$')
+    plt.xlabel('$x$ $[\\xi]$')
     plt.ylabel('t')
     plt.colorbar()
     plt.savefig(name)
