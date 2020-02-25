@@ -197,7 +197,7 @@ def main():
     np.save('{}/{}'.format(DATA_PATH, 0), psi)
 
     # Propagate in time, plot and save results
-    for i in tqdm(range(700)):
+    for i in tqdm(range(500)):
         psi = propagate_state(psi, num_steps=10, dt=DT)
         # NOTE The total iteration time is given by 10*500*DT, as 10 time steps
         #      of size DT are done in each iteration step.

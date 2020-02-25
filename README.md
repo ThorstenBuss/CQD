@@ -6,10 +6,12 @@ We provide three configurable models:
 2. [Solitons in a 2d BEC](https://github.com/ThorstenBuss/CQD/blob/master/solitons2d.py)
 3. [Vortices in a 2d BEC](https://github.com/ThorstenBuss/CQD/blob/master/vortices2d.py)
 
+## Running a model
+
 In order to run the scripts, copy the files to a newly created project directory and simply use
 
 ```bash
-python <model_name>
+$ python <model_name>
 ```
 
 Here, replace `model_name` by either `solitons1d`, `solitons2d`, or `vortices2d`.
