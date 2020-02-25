@@ -18,7 +18,7 @@ import numpy as np
 import os
 from tqdm import tqdm
 
-myfontsize = 10
+myfontsize = 15
 
 from matplotlib import rc
 rc('font',**{'family':'serif','serif':['Computer Modern Roman'],
@@ -242,10 +242,11 @@ def plot(grid,nx_grid,ny_grid,i,xi):
         extent=[0, nx_grid/xi, 0, ny_grid/xi]
     )
     cbar =  plt.colorbar()
-    cbar.set_label(r'Density',labelpad=5,fontsize=20)
+    cbar.set_label(r'Density',labelpad=5,fontsize=myfontsize)
     plt.xlabel('$x$ $[\\xi]$')
     plt.ylabel('$y$ $[\\xi]$')
-    plt.savefig('plots/{}/density/{}.png'.format(dase,i),dpi=300)
+    plt.savefig('plots/{}/density/{}.png'.format(dase,i), dpi=300,
+                bbox_inches='tight')
     plt.close()
 
     #### Phase ########################################
@@ -261,10 +262,11 @@ def plot(grid,nx_grid,ny_grid,i,xi):
     )
     cbar = plt.colorbar(ticks=[-np.pi, 0, np.pi])
     cbar.ax.set_yticklabels(['$-\pi$', '0', '$\pi$'])
-    cbar.set_label(r'Phase angle',labelpad=5,fontsize=20)
+    cbar.set_label(r'Phase angle',labelpad=5,fontsize=myfontsize)
     plt.xlabel('$x$ $[\\xi]$')
     plt.ylabel('$y$ $[\\xi]$')
-    plt.savefig('plots/{}/phase/{}.png'.format(dase,i),dpi=300)
+    plt.savefig('plots/{}/phase/{}.png'.format(dase,i), dpi=300,
+                bbox_inches='tight')
     plt.close()
 
 

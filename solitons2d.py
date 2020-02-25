@@ -18,7 +18,7 @@ import numpy as np
 import os
 from tqdm import tqdm
 
-myfontsize = 10
+myfontsize = 15
 
 from matplotlib import rc
 rc('font',**{'family':'serif','serif':['Computer Modern Roman'],
@@ -117,10 +117,11 @@ def plot(psi, file_name):
         extent=[-L/2, L/2-DX, -L/2, L/2-DX]
     )
     cbar =  plt.colorbar()
-    cbar.set_label(r'Density', labelpad=5, fontsize=20)
+    cbar.set_label(r'Density', labelpad=5, fontsize=myfontsize)
     plt.xlabel('$x$ $[\\xi]$')
     plt.ylabel('$y$ $[\\xi]$')
-    plt.savefig('{}/density/{}.png'.format(FIGURE_PATH, file_name), dpi=300)
+    plt.savefig('{}/density/{}.png'.format(FIGURE_PATH, file_name), dpi=300,
+                bbox_inches='tight')
     plt.close()
 
     # Phase plot
@@ -136,10 +137,11 @@ def plot(psi, file_name):
     )
     cbar = plt.colorbar(ticks=[-np.pi, 0, np.pi])
     cbar.ax.set_yticklabels(['$-\pi$', '0', '$\pi$'])
-    cbar.set_label(r'Phase angle', labelpad=5, fontsize=20)
+    cbar.set_label(r'Phase angle', labelpad=5, fontsize=myfontsize)
     plt.xlabel('$x$ $[\\xi]$')
     plt.ylabel('$y$ $[\\xi]$')
-    plt.savefig('{}/phase/{}.png'.format(FIGURE_PATH, file_name), dpi=300)
+    plt.savefig('{}/phase/{}.png'.format(FIGURE_PATH, file_name), dpi=300,
+                bbox_inches='tight')
     plt.close()
 
 def propagate_state(psi0, *, num_steps, dt=DT):
@@ -195,7 +197,7 @@ def main():
     np.save('{}/{}'.format(DATA_PATH, 0), psi)
 
     # Propagate in time, plot and save results
-    for i in tqdm(range(500)):
+    for i in tqdm(range(700)):
         psi = propagate_state(psi, num_steps=10, dt=DT)
         # NOTE The total iteration time is given by 10*500*DT, as 10 time steps
         #      of size DT are done in each iteration step.

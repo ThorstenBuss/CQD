@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-myfontsize = 10
+myfontsize = 15
 
 from matplotlib import rc
 rc('font', **{'family':'serif','serif':['Computer Modern Roman'],
@@ -134,7 +134,7 @@ def run_and_plot(psi0, *, num_steps, dt=DT, file_name):
     plt.ylabel('t')
     cbar = plt.colorbar()
     cbar.set_label(r'Density', labelpad=5, fontsize=myfontsize)
-    plt.savefig(file_name, dpi=300)
+    plt.savefig(file_name, dpi=300, bbox_inches='tight')
     plt.close()
 
 def run_and_plot_sym(nu, dt=DT):
@@ -154,7 +154,7 @@ def main():
     plt.xlabel('$x$ $[\\xi]$')
     plt.ylabel('Phase')
     plt.legend()
-    plt.savefig(FIGURE_PATH+'/phase.png', dpi=300)
+    plt.savefig(FIGURE_PATH+'/phase.png', dpi=300, bbox_inches='tight')
     plt.close()
 
     plt.plot(np.real(GRID), np.real(abs_square(psi0)),label='$\\nu=0$')
@@ -162,7 +162,7 @@ def main():
     plt.xlabel('$x$ $[\\xi]$')
     plt.ylabel('Density')
     plt.legend()
-    plt.savefig(FIGURE_PATH+'/density.png', dpi=300)
+    plt.savefig(FIGURE_PATH+'/density.png', dpi=300, bbox_inches='tight')
     plt.close()
 
     psi0  = black_soliton(-10.) * black_soliton(10.)
