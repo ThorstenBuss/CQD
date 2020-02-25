@@ -317,7 +317,7 @@ def main(argv):
         n = 4      ### quantization of the vortices 
         grid =create_2d_regular_vortex_grid_offset(nx_grid, ny_grid, lx, ly, n, N, g)
 
-    grid *= np.random.normal(1,0.01,(nx_grid,ny_grid)).astype(complex)
+    grid *= np.random.normal(1,0.01,(nx_grid,ny_grid)).astype(complex) ### add noise
     grid *= np.sqrt(N/calculate_particle_number(grid))               ### normalize to initially set particle number
     print("Particle number on created vortex grid: " , calculate_particle_number(grid))
 
