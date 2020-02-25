@@ -248,7 +248,15 @@ def plot(grid,nx_grid,ny_grid,i):
     ytick_lbls = np.r_[0:stepsx*factorx:1j*(stepsx+1)]     
 
     ##### Density #######################################
-    plt.imshow(np.abs(grid)**2,interpolation='nearest', origin='lower left', label = r'', vmin=0, vmax=10)
+    plt.imshow(
+        np.abs(grid)**2,
+        interpolation='nearest',
+        origin='lower left',
+        label = r'',
+        vmin=0,
+        vmax=1.1,
+        extent=[-L/2, L/2-dx, -L/2, L/2-dx]
+    )
     cbar =  plt.colorbar()
     cbar.set_label(r'Density',labelpad=5,fontsize=20)
     plt.xlabel('$x$ $[\\xi]$')
@@ -257,7 +265,16 @@ def plot(grid,nx_grid,ny_grid,i):
     plt.close()
 
     #### Phase ########################################
-    plt.imshow(np.angle(grid),interpolation='nearest', origin='lower left', label = r'', vmin=-np.pi, vmax=np.pi, cmap ='hsv')
+    plt.imshow(
+        np.angle(grid),
+        interpolation='nearest',
+        origin='lower left',
+        label = r'',
+        vmin=-np.pi,
+        vmax=np.pi,
+        cmap ='hsv',
+        extent=[-L/2, L/2-dx, -L/2, L/2-dx]
+    )
     cbar = plt.colorbar(ticks=[-np.pi, 0, np.pi])
     cbar.ax.set_yticklabels(['$-\pi$', '0', '$\pi$'])
     cbar.set_label(r'Phase angle',labelpad=5,fontsize=20)
