@@ -37,7 +37,7 @@ DT      = 0.01                                      # Time step size
 H_KIN   = 0.5*(2*np.pi*np.fft.fftfreq(N, d=DX))**2  # Kinetic part of the
                                                     # Hamiltonian
 
-FIGURE_PATH = "plots/solitons1d/"                   # Where to save the figures
+FIGURE_PATH = "plots/solitons1d"                    # Where to store the figures
 
 # .. Model utility functions ..................................................
 
@@ -52,7 +52,7 @@ def abs_square(arr):
     """
     return np.conjugate(arr)*arr
 
-def pot_diag(psi):
+def h_pot(psi):
     """Returns the potential part of the Hamiltonian (in diagonal form) which
     is given by the absolute square of the wavefunction.
     
@@ -91,7 +91,7 @@ def black_soliton(z0):
 # .. Core functions and plotting ..............................................
 
 def time_evolution(psi0, num_steps, dt=DT):
-    """Calculates the time evolution of the probability density given an
+    """Calculates the GPE time evolution of the probability density given an
     initial state using the split-step fourier method.
     
     Args:
@@ -111,12 +111,12 @@ def time_evolution(psi0, num_steps, dt=DT):
         psi = np.fft.fft(psi)
         psi = np.exp(-1j*dt*H_KIN)*psi
         psi = np.fft.ifft(psi)
-        psi = np.exp(-1j*dt*pot_diag(psi))*psi
+        psi = np.exp(-1j*dt*h_pot(psi))*psi
         prob_densities[i+1] = np.real(abs_square(psi))
 
     return prob_densities
 
-def run_and_plot(psi0, *, num_steps, dt=DT, fig_title):
+def run_and_plot(psi0, *, num_steps, dt=DT, file_name):
     """Runs the model given an initial state and plots the temporal
     development of the probability density.
     
@@ -124,7 +124,7 @@ def run_and_plot(psi0, *, num_steps, dt=DT, fig_title):
         psi0 (np.array): Initial state
         num_steps (int): Number of iteration steps
         dt (float, optional): Time step size
-        fig_title (str): Figure title
+        file_name (str): Figure title
     """
     prob_densities = time_evolution(psi0, num_steps=num_steps, dt=dt)
 
@@ -134,17 +134,17 @@ def run_and_plot(psi0, *, num_steps, dt=DT, fig_title):
     plt.ylabel('t')
     cbar = plt.colorbar()
     cbar.set_label(r'Density', labelpad=5, fontsize=myfontsize)
-    plt.savefig(fig_title, dpi=300)
+    plt.savefig(file_name, dpi=300)
     plt.close()
 
 def run_and_plot_sym(nu, dt=DT):
     psi0  = dark_soliton(-10., nu=nu) * dark_soliton(10., nu=-nu)
     run_and_plot(psi0, num_steps=int(20/(nu*dt)),
-                 fig_title=FIGURE_PATH+'nu{}.png'.format(nu))
+                 file_name=FIGURE_PATH+'/nu{}.png'.format(nu))
 
 def main():
     # Store the created plots here
-    os.system('mkdir -p ' + FIGURE_PATH)
+    os.system('mkdir -p {}'.format(FIGURE_PATH))
 
     psi0  = black_soliton(0)
     psi1  = dark_soliton(0,0.5)
@@ -154,7 +154,7 @@ def main():
     plt.xlabel('$x$ $[\\xi]$')
     plt.ylabel('Phase')
     plt.legend()
-    plt.savefig(FIGURE_PATH+'phase.png', dpi=300)
+    plt.savefig(FIGURE_PATH+'/phase.png', dpi=300)
     plt.close()
 
     plt.plot(np.real(GRID), np.real(abs_square(psi0)),label='$\\nu=0$')
@@ -162,11 +162,11 @@ def main():
     plt.xlabel('$x$ $[\\xi]$')
     plt.ylabel('Density')
     plt.legend()
-    plt.savefig(FIGURE_PATH+'density.png', dpi=300)
+    plt.savefig(FIGURE_PATH+'/density.png', dpi=300)
     plt.close()
 
     psi0  = black_soliton(-10.) * black_soliton(10.)
-    run_and_plot(psi0, num_steps=100, fig_title=FIGURE_PATH+'nu0.0.png')
+    run_and_plot(psi0, num_steps=100, file_name=FIGURE_PATH+'/nu0.0.png')
 
     run_and_plot_sym(0.3)
     run_and_plot_sym(0.5)
@@ -178,7 +178,7 @@ def main():
              * dark_soliton(6., nu=0.967746031217134))
 
     run_and_plot(psi0, num_steps=10000, dt=DT/2,
-                 fig_title=FIGURE_PATH+'nu0.3nu0.05.png')
+                 file_name=FIGURE_PATH+'/nu0.3nu0.05.png')
 
 if __name__ == "__main__":
     main()

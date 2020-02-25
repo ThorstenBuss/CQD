@@ -15,20 +15,20 @@ mpl.rcParams.update(pgf_with_rc_fonts)
 
 import matplotlib.pyplot as plt
 import numpy as np
-import sys
 import os
 from tqdm import tqdm
 
 myfontsize = 10
-dase = 'vortices2d'
 
 from matplotlib import rc
-rc('font',**{'family':'serif','serif':['Computer Modern Roman'], 'size':myfontsize})
+rc('font',**{'family':'serif','serif':['Computer Modern Roman'],
+   'size':myfontsize})
 rc('text', usetex=True)
 rc('legend', fontsize=myfontsize)
 
 # .. Model Parameters .........................................................
 
+dase = 'vortices2d'
 
 # .. Model utility functions ..................................................
 
@@ -271,7 +271,7 @@ def plot(grid,nx_grid,ny_grid,i,xi):
 #######################################################
 #### Main program to initialize a vortex grid #########
 #######################################################
-def main(argv):
+def main():
     os.system('mkdir -p plots/{}/phase'.format(dase))
     os.system('mkdir -p plots/{}/density'.format(dase))
     
@@ -328,4 +328,4 @@ def main(argv):
 
 
 if __name__=='__main__':
-    main(sys.argv)
+    main()
