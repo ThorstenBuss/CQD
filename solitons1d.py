@@ -127,7 +127,7 @@ def run_and_plot(psi0, *, num_steps, dt=DT, fig_title):
         dt (float, optional): Time step size
         fig_title (str): Figure title
     """
-    prob_densities = time_evolution(psi0, num_steps=num_steps)
+    prob_densities = time_evolution(psi0, num_steps=num_steps, dt=dt)
 
     plt.imshow(prob_densities, cmap=plt.get_cmap("BuPu"), origin='lower', 
                extent=[-L/2, L/2-DX, dt/2, (num_steps+1/2)*dt], aspect='auto')
@@ -159,7 +159,8 @@ def main():
              * dark_soliton(-2., nu=-0.05)
              * dark_soliton(6., nu=0.967746031217134))
 
-    run_and_plot(psi0, num_steps=3000, fig_title=FIGURE_PATH+'nu0.3nu0.05.png')
+    run_and_plot(psi0, num_steps=10000, dt=DT/2,
+                 fig_title=FIGURE_PATH+'nu0.3nu0.05.png')
 
 if __name__ == "__main__":
     main()
