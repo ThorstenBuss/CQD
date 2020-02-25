@@ -1,11 +1,11 @@
-import matplotlib as mpl
+'''import matplotlib as mpl
 mpl.rcParams['legend.handlelength'] = 0.5
 pgf_with_rc_fonts = {
     "font.family": "serif",
     "font.serif": [],
     "font.sans-serif": ["DejaVu Sans"]
 }
-mpl.rcParams.update(pgf_with_rc_fonts)
+mpl.rcParams.update(pgf_with_rc_fonts)'''
 
 import matplotlib.pyplot as plt
 import scipy.linalg as LA
@@ -14,10 +14,10 @@ import os
 
 myfontsize = 9
 
-from matplotlib import rc
+'''from matplotlib import rc
 rc('font',**{'family':'serif','serif':['Computer Modern Roman'], 'size':myfontsize})
 rc('text', usetex=True)
-rc('legend', fontsize=myfontsize)
+rc('legend', fontsize=myfontsize)'''
 
 L       =  40
 npoints = 600
@@ -78,6 +78,55 @@ def plot(psi0, name, tsteps_, dt_=dt):
     plt.savefig(name,dpi=300)
     plt.close()
 
+def plot_soliton(nu1,nu2):
+    fig, ax1=plt.subplots(2,figsize=(10,10))
+
+    titlesize=20
+    labelsize=20
+    color = 'tab:red'
+    ax1[0].plot(grid,np.abs(grey_soliton(nu1,z0=0))**2,color=color)
+    ax1[1].plot(grid,np.abs(grey_soliton(nu2,z0=0))**2,color=color)
+    
+    ax1[0].tick_params(axis='y', labelcolor=color)
+    ax1[1].tick_params(axis='y', labelcolor=color)
+    
+    ax1[0].tick_params(labelsize=labelsize)
+    ax1[1].tick_params(labelsize=labelsize)
+    
+    ax1[0].set_ylim(-0.1/np.pi,1+0.1/np.pi)
+    ax1[1].set_ylim(-0.1/np.pi,1+0.1/np.pi)
+    
+    ax1[0].set_title('v=0.5',fontsize=titlesize,loc='left')
+    ax1[1].set_title('v=0',fontsize= titlesize,loc='left')
+    
+    ax1[0].set_xlabel('x',fontsize=labelsize)
+    ax1[1].set_xlabel('x',fontsize=labelsize)
+    
+    ax1[0].set_ylabel('$\phi^2$', color=color,fontsize=labelsize)
+    ax1[1].set_ylabel('$\phi^2$', color=color,fontsize=labelsize)
+
+
+    ax20= ax1[0].twinx()
+    ax21= ax1[1].twinx()
+
+    color = 'tab:blue'
+    ax20.set_ylim(-0.1,np.pi+0.1)
+    ax21.set_ylim(-0.1,np.pi+0.1)
+    
+    ax20.set_ylabel('$\Theta$', color=color,fontsize=labelsize)
+    ax21.set_ylabel('$\Theta$', color=color,fontsize=labelsize)
+    
+    ax20.tick_params(axis='y', labelcolor=color)
+    ax21.tick_params(axis='y', labelcolor=color)
+    
+    ax20.tick_params(labelsize=labelsize)
+    ax21.tick_params(labelsize=labelsize)
+    
+    ax20.plot(grid,np.angle(grey_soliton(nu1,z0=0)),color=color)
+    ax21.plot(grid,np.angle(grey_soliton(nu2,z0=0)),color=color)
+    
+    plt.savefig('plots/Soliton.png',format = 'png', dpi=600)   
+    
 def plot_sym(nu):
     psi0  = grey_soliton(nu,-10)
     psi0 *= grey_soliton(-nu, 10)
@@ -99,6 +148,8 @@ def main():
     psi0 *= grey_soliton( 0.967746031217134,  6)
 
     plot(psi0,'plots/nu0.3nu0.05.png',10000,dt/2)
+    
+    plot_soliton(0.5,0)
 
 if __name__ == "__main__":
     main()
