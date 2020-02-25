@@ -125,10 +125,12 @@ def main():
     os.system('mkdir -p plots/{}/phase'.format(dase))
     os.system('mkdir -p plots/{}/density'.format(dase))
 
-    #psi = grey_soliton(0.,-10)*grey_soliton(-0.,10)
+    psi = grey_soliton(0.,-10)*grey_soliton(-0.,10)
     #psi = ring()
-    psi = grey_soliton_rand_pos(0.,-10)*grey_soliton_rand_pos(-0.,10)
+    #psi = grey_soliton_rand_pos(0.,-10)*grey_soliton_rand_pos(-0.,10)
     #psi = rand2d()*grey_soliton(0.,-10)*grey_soliton(-0.,10)
+    r = np.random.normal(1,0.1,(npoints,npoints)).astype(complex)
+    psi = r*psi
 
     plot(psi,npoints,npoints,0)
     np.save('data/{}/{}'.format(dase,0), psi)
