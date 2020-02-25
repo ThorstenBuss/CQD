@@ -20,7 +20,7 @@ import timeit
 import os
 from tqdm import tqdm
 
-myfontsize = 9
+myfontsize = 10
 dase = 'vortices2d'
 
 from matplotlib import rc
@@ -230,25 +230,17 @@ def TimeEvolution(psi0, g, tsteps_, dt_,dx):
     psi  = np.exp(-1j*(dt_/2)*g*np.conjugate(psi)*psi)*psi
     return psi
 
-def plot(grid,nx_grid,ny_grid,i):
-    fulllengthy = ny_grid
-    factory = 8.
-    stepsy = (int)(fulllengthy/factory)
-    maxLengthy = (int)(ny_grid*(stepsy*factory)/fulllengthy)
-
-    xtick_locs = np.r_[0:maxLengthy:1j*(stepsy+1)]
-    xtick_lbls = np.r_[0:stepsy*factory:1j*(stepsy+1)]
-
-    fulllengthx = nx_grid
-    factorx = 8.
-    stepsx = (int)(fulllengthx/factorx)
-    maxLengthx = (int)(nx_grid*(stepsx*factorx)/fulllengthx)
-
-    ytick_locs = np.r_[0:maxLengthx:1j*(stepsx+1)]
-    ytick_lbls = np.r_[0:stepsx*factorx:1j*(stepsx+1)]     
-
+def plot(grid,nx_grid,ny_grid,i,xi):
     ##### Density #######################################
-    plt.imshow(np.abs(grid)**2,interpolation='nearest', origin='lower left', label = r'', vmin=0, vmax=10)
+    plt.imshow(
+        np.abs(grid)**2,
+        interpolation='nearest',
+        origin='lower left',
+        label = r'',
+        vmin=0,
+        vmax=10,
+        extent=[0, nx_grid/xi, 0, ny_grid/xi]
+    )
     cbar =  plt.colorbar()
     cbar.set_label(r'Density',labelpad=5,fontsize=20)
     plt.xlabel('$x$ $[\\xi]$')
@@ -257,7 +249,16 @@ def plot(grid,nx_grid,ny_grid,i):
     plt.close()
 
     #### Phase ########################################
-    plt.imshow(np.angle(grid),interpolation='nearest', origin='lower left', label = r'', vmin=-np.pi, vmax=np.pi, cmap ='hsv')
+    plt.imshow(
+        np.angle(grid),
+        interpolation='nearest',
+        origin='lower left',
+        label = r'',
+        vmin=-np.pi,
+        vmax=np.pi,
+        cmap ='hsv',
+        extent=[0, nx_grid/xi, 0, ny_grid/xi]
+    )
     cbar = plt.colorbar(ticks=[-np.pi, 0, np.pi])
     cbar.ax.set_yticklabels(['$-\pi$', '0', '$\pi$'])
     cbar.set_label(r'Phase angle',labelpad=5,fontsize=20)
@@ -277,8 +278,8 @@ def main(argv):
     do_test_vortexpair_grid = False      ### if True initial grid will be vortice on fixed positions for testing
     do_random_vortexpair_grid = False    ### if True initial grid will be vortex grid with an equal number of vortices and antivortices placed at random positions
     do_random_vortex_grid = False        ### if True initial grid will be vortex grid composed of vortices with equal quantization placed at random positions
-    do_regular_vortex_grid = False       ### if True initial grid will be regular vortex grid, i.e. equal distances between vortices and antivortices
-    do_regular_vortex_grid_offset = True
+    do_regular_vortex_grid = True        ### if True initial grid will be regular vortex grid, i.e. equal distances between vortices and antivortices
+    do_regular_vortex_grid_offset = False
 
     nx_grid = 64    ### number of grid points in x-direction
     ny_grid = 64    ### number of grid points in y-direction
@@ -316,13 +317,14 @@ def main(argv):
         n = 4      ### quantization of the vortices 
         grid =create_2d_regular_vortex_grid_offset(nx_grid, ny_grid, lx, ly, n, N, g)
 
-    grid *= np.sqrt(1.*N/calculate_particle_number(grid))               ### normalize to initially set particle number
+    grid *= np.random.normal(1,0.01,(nx_grid,ny_grid)).astype(complex) ### add noise
+    grid *= np.sqrt(N/calculate_particle_number(grid))               ### normalize to initially set particle number
     print("Particle number on created vortex grid: " , calculate_particle_number(grid))
 
-    plot(grid,nx_grid,ny_grid,0)
-    for i in tqdm(range(500)):
+    plot(grid,nx_grid,ny_grid,0,xi)
+    for i in tqdm(range(1000)):
         grid = TimeEvolution(grid, g, 5, 0.002,1/xi)
-        plot(grid,nx_grid,ny_grid,i+1)
+        plot(grid,nx_grid,ny_grid,i+1,xi)
 
 
 if __name__=='__main__':
