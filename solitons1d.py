@@ -14,11 +14,10 @@ pgf_with_rc_fonts = {
 mpl.rcParams.update(pgf_with_rc_fonts)
 
 import matplotlib.pyplot as plt
-import scipy.linalg as LA
 import numpy as np
 import os
 
-myfontsize = 9
+myfontsize = 10
 
 from matplotlib import rc
 rc('font', **{'family':'serif','serif':['Computer Modern Roman'],
@@ -65,7 +64,7 @@ def pot_diag(psi):
     """
     return abs_square(psi)
 
-def dark_soliton(z0, *, nu=0.5):
+def dark_soliton(z0, nu=0.5):
     """Returns a dark (grey) soliton.
     
     Args:
@@ -91,7 +90,7 @@ def black_soliton(z0):
 
 # .. Core functions and plotting ..............................................
 
-def time_evolution(psi0, *, num_steps, dt=DT):
+def time_evolution(psi0, num_steps, dt=DT):
     """Calculates the time evolution of the probability density given an
     initial state using the split-step fourier method.
     
@@ -105,7 +104,7 @@ def time_evolution(psi0, *, num_steps, dt=DT):
         columns in temporal order.
     """
     prob_densities = np.zeros((num_steps+1, N))
-    psi = np.exp(-1j*(dt/2)*pot_diag(psi0))*psi0
+    psi = psi0
     prob_densities[0] = np.real(abs_square(psi))
 
     for i in range(num_steps):
@@ -134,7 +133,7 @@ def run_and_plot(psi0, *, num_steps, dt=DT, fig_title):
     plt.xlabel('$x$ $[\\xi]$')
     plt.ylabel('t')
     cbar = plt.colorbar()
-    cbar.set_label(r'Density', labelpad=5, fontsize=10)
+    cbar.set_label(r'Density', labelpad=5, fontsize=myfontsize)
     plt.savefig(fig_title, dpi=300)
     plt.close()
 
@@ -146,6 +145,25 @@ def run_and_plot_sym(nu, dt=DT):
 def main():
     # Store the created plots here
     os.system('mkdir -p ' + FIGURE_PATH)
+
+    psi0  = black_soliton(0)
+    psi1  = dark_soliton(0,0.5)
+
+    plt.plot(np.real(GRID), np.real(np.angle(psi0)),label='$\\nu=0$')
+    plt.plot(np.real(GRID), np.real(np.angle(psi1)),label='$\\nu=0.5$')
+    plt.xlabel('$x$ $[\\xi]$')
+    plt.ylabel('Phase')
+    plt.legend()
+    plt.savefig(FIGURE_PATH+'phase.png', dpi=300)
+    plt.close()
+
+    plt.plot(np.real(GRID), np.real(abs_square(psi0)),label='$\\nu=0$')
+    plt.plot(np.real(GRID), np.real(abs_square(psi1)),label='$\\nu=0.5$')
+    plt.xlabel('$x$ $[\\xi]$')
+    plt.ylabel('Density')
+    plt.legend()
+    plt.savefig(FIGURE_PATH+'density.png', dpi=300)
+    plt.close()
 
     psi0  = black_soliton(-10.) * black_soliton(10.)
     run_and_plot(psi0, num_steps=100, fig_title=FIGURE_PATH+'nu0.0.png')
