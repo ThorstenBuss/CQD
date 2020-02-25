@@ -62,23 +62,6 @@ def ring(R=5,nu=-0.5):
     return ret*np.ones((npoints,npoints))
 
 def plot(grid,nx_grid,ny_grid,i):
-    fulllengthy = ny_grid
-    factory = 8.
-    stepsy = (int)(fulllengthy/factory)
-    maxLengthy = (int)(ny_grid*(stepsy*factory)/fulllengthy)
-
-    xtick_locs = np.r_[0:maxLengthy:1j*(stepsy+1)]
-    xtick_lbls = np.r_[0:stepsy*factory:1j*(stepsy+1)]
-
-    fulllengthx = nx_grid
-    factorx = 8.
-    stepsx = (int)(fulllengthx/factorx)
-    maxLengthx = (int)(nx_grid*(stepsx*factorx)/fulllengthx)
-
-    ytick_locs = np.r_[0:maxLengthx:1j*(stepsx+1)]
-    ytick_lbls = np.r_[0:stepsx*factorx:1j*(stepsx+1)]     
-
-
     ##### Density #######################################
     plt.imshow(
         np.abs(grid)**2,
@@ -95,7 +78,6 @@ def plot(grid,nx_grid,ny_grid,i):
     plt.ylabel('$y$ $[\\xi]$')
     plt.savefig('plots/{}/density/{}.png'.format(dase,i),dpi=300)
     plt.close()
-
 
     #### Phase ########################################
     plt.imshow(
@@ -146,12 +128,11 @@ def main():
     #psi = ring()
     #psi = grey_soliton_rand_pos(0.,-10)*grey_soliton_rand_pos(-0.,10)
     #psi = rand2d()*grey_soliton(0.,-10)*grey_soliton(-0.,10)
-    r = np.random.normal(1,0.01,(npoints,npoints)).astype(complex)
-    psi = r*psi
+    psi *= np.random.normal(1,0.01,(npoints,npoints)).astype(complex)
 
     plot(psi,npoints,npoints,0)
     np.save('data/{}/{}'.format(dase,0), psi)
-    for i in tqdm(range(500)):
+    for i in tqdm(range(1000)):
         psi = TimeEvolution(psi, 10, 0.01)
         plot(psi,npoints,npoints,i+1)
         np.save('data/{}/{}'.format(dase,i+1), psi)
