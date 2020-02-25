@@ -80,7 +80,15 @@ def plot(grid,nx_grid,ny_grid,i):
 
 
     ##### Density #######################################
-    plt.imshow(np.abs(grid)**2,interpolation='nearest', origin='lower left', label = r'', vmin=0, vmax=1.1)
+    plt.imshow(
+        np.abs(grid)**2,
+        interpolation='nearest',
+        origin='lower left',
+        label = r'',
+        vmin=0,
+        vmax=1.1,
+        extent=[-L/2, L/2-dx, -L/2, L/2-dx]
+    )
     cbar =  plt.colorbar()
     cbar.set_label(r'Density',labelpad=5,fontsize=20)
     plt.xlabel('$x$ $[\\xi]$')
@@ -90,7 +98,16 @@ def plot(grid,nx_grid,ny_grid,i):
 
 
     #### Phase ########################################
-    plt.imshow(np.angle(grid),interpolation='nearest', origin='lower left', label = r'', vmin=-np.pi, vmax=np.pi, cmap ='hsv')
+    plt.imshow(
+        np.angle(grid),
+        interpolation='nearest',
+        origin='lower left',
+        label = r'',
+        vmin=-np.pi,
+        vmax=np.pi,
+        cmap ='hsv',
+        extent=[-L/2, L/2-dx, -L/2, L/2-dx]
+    )
     cbar = plt.colorbar(ticks=[-np.pi, 0, np.pi])
     cbar.ax.set_yticklabels(['$-\pi$', '0', '$\pi$'])
     cbar.set_label(r'Phase angle',labelpad=5,fontsize=20)
@@ -129,7 +146,7 @@ def main():
     #psi = ring()
     #psi = grey_soliton_rand_pos(0.,-10)*grey_soliton_rand_pos(-0.,10)
     #psi = rand2d()*grey_soliton(0.,-10)*grey_soliton(-0.,10)
-    r = np.random.normal(1,0.1,(npoints,npoints)).astype(complex)
+    r = np.random.normal(1,0.01,(npoints,npoints)).astype(complex)
     psi = r*psi
 
     plot(psi,npoints,npoints,0)
