@@ -1,3 +1,9 @@
+#####################################
+# 1D GPE model of solitons in a BEC #
+#####################################
+
+# .. Layout Setup .............................................................
+
 import matplotlib as mpl
 mpl.rcParams['legend.handlelength'] = 0.5
 pgf_with_rc_fonts = {
@@ -15,80 +21,145 @@ import os
 myfontsize = 9
 
 from matplotlib import rc
-rc('font',**{'family':'serif','serif':['Computer Modern Roman'], 'size':myfontsize})
+rc('font', **{'family':'serif','serif':['Computer Modern Roman'],
+   'size':myfontsize})
 rc('text', usetex=True)
 rc('legend', fontsize=myfontsize)
 
-L       =  40
-npoints = 600
-dt      =   0.01
+# .. Model Parameters .........................................................
 
-dx      = L/npoints
-grid  = np.arange(-L/2,L/2,dx,complex)
+L       = 40                                        # Domain size
+N       = 600                                       # Number of grid points
+DX      = L / N                                     # Cell size
+GRID    = np.arange(-L/2, L/2, DX, dtype=complex)   # The grid
 
-def H1diag(t):
-    k = 2*np.pi*np.fft.fftfreq(npoints,d=dx)
-    Es = k*k/2
-    return Es
+DT      = 0.01                                      # Time step size
 
-def H2diag(t,psi):
-    return np.conjugate(psi)*psi
+H_KIN   = 0.5*(2*np.pi*np.fft.fftfreq(N, d=DX))**2  # Kinetic part of the
+                                                    # Hamiltonian
 
-def grey_soliton(nu=0.5,z0=0):
-    gamma=1/np.sqrt(1-nu**2)
-    return 1j*nu+1/gamma*np.tanh((grid-z0)/(gamma))
+FIGURE_PATH = "plots/solitons1d/"                   # Where to save the figures
 
-def dark_soliton(z0=0):
-    return grey_soliton(nu=0,z0=z0)
+# .. Model utility functions ..................................................
 
-def TimeEvolution(psi0, tsteps_, dt_=dt):
-    all_psis = np.zeros((tsteps_+1,npoints))
-    t = 0
-    psi = np.exp(-1j*(dt_/2)*H2diag(t,psi0))*psi0
-    t += dt_/2
-    all_psis[0] = np.real(np.conjugate(psi)*psi)
-    for i in range(tsteps_):
-        psi_ = np.fft.fft(psi)
-        psi_ = np.exp(-1j*dt_*H1diag(t))*psi_
-        t += dt_/2
-        psi  = np.fft.ifft(psi_)
-        psi  = np.exp(-1j*dt_*H2diag(t,psi))*psi
-        t += dt_/2
-        all_psis[i+1] = np.real(np.conjugate(psi)*psi)
-    return all_psis
+def abs_square(arr):
+    """Returns the absolute square of a complex array.
+    
+    Args:
+        arr (np.array): Input array
+    
+    Returns:
+        np.array: Absolute square of input
+    """
+    return np.conjugate(arr)*arr
 
-def plot(psi0, name, tsteps_, dt_=dt):
-    all_psis = TimeEvolution(psi0, tsteps_, dt_)
-    plt.imshow(all_psis, cmap=plt.get_cmap("BuPu"), origin='lower', 
-           extent=[-L/2,L/2-dx, dt_/2, (tsteps_+1/2)*dt_], aspect='auto')
+def pot_diag(psi):
+    """Returns the potential part of the Hamiltonian (in diagonal form) which
+    is given by the absolute square of the wavefunction.
+    
+    Args:
+        psi (np.array): State
+    
+    Returns:
+        np.array: Potential part of the Hamiltonian
+    """
+    return abs_square(psi)
+
+def dark_soliton(z0, *, nu=0.5):
+    """Returns a dark (grey) soliton.
+    
+    Args:
+        z0 (float): Initial position
+        nu (float, optional): Greyness
+    
+    Returns:
+        Dark soliton
+    """
+    gamma = 1./np.sqrt(1.-nu**2)
+    return 1j*nu + np.tanh((GRID-z0)/gamma)/gamma
+
+def black_soliton(z0):
+    """Returns a black soliton, i.e., a stationary dark soliton.
+    
+    Args:
+        z0 (float): Initial position
+    
+    Returns:
+        Black soliton
+    """
+    return dark_soliton(z0, nu=0.)
+
+# .. Core functions and plotting ..............................................
+
+def time_evolution(psi0, *, num_steps, dt=DT):
+    """Calculates the time evolution of the probability density given an
+    initial state using the split-step fourier method.
+    
+    Args:
+        psi0 (np.array): Initial state
+        num_steps (int): Number of iteration steps
+        dt (float, optional): Time step size
+    
+    Returns:
+        Probability density for all iteration times; states are sorted in
+        columns in temporal order.
+    """
+    prob_densities = np.zeros((num_steps+1, N))
+    psi = np.exp(-1j*(dt/2)*pot_diag(psi0))*psi0
+    prob_densities[0] = np.real(abs_square(psi))
+
+    for i in range(num_steps):
+        psi = np.fft.fft(psi)
+        psi = np.exp(-1j*dt*H_KIN)*psi
+        psi = np.fft.ifft(psi)
+        psi = np.exp(-1j*dt*pot_diag(psi))*psi
+        prob_densities[i+1] = np.real(abs_square(psi))
+
+    return prob_densities
+
+def run_and_plot(psi0, *, num_steps, dt=DT, fig_title):
+    """Runs the model given an initial state and plots the temporal
+    development of the probability density.
+    
+    Args:
+        psi0 (np.array): Initial state
+        num_steps (int): Number of iteration steps
+        dt (float, optional): Time step size
+        fig_title (str): Figure title
+    """
+    prob_densities = time_evolution(psi0, num_steps=num_steps)
+
+    plt.imshow(prob_densities, cmap=plt.get_cmap("BuPu"), origin='lower', 
+               extent=[-L/2, L/2-DX, dt/2, (num_steps+1/2)*dt], aspect='auto')
     plt.xlabel('$x$ $[\\xi]$')
     plt.ylabel('t')
     cbar = plt.colorbar()
-    cbar.set_label(r'Density',labelpad=5,fontsize=20)
-    plt.savefig(name,dpi=300)
+    cbar.set_label(r'Density', labelpad=5, fontsize=10)
+    plt.savefig(fig_title, dpi=300)
     plt.close()
 
-def plot_sym(nu):
-    psi0  = grey_soliton(nu,-10)
-    psi0 *= grey_soliton(-nu, 10)
-    plot(psi0,'plots/nu{}.png'.format(nu),tsteps_=int(20/(nu*dt)))
+def run_and_plot_sym(nu, dt=DT):
+    psi0  = dark_soliton(-10., nu=nu) * dark_soliton(10., nu=-nu)
+    run_and_plot(psi0, num_steps=int(20/(nu*dt)),
+                 fig_title=FIGURE_PATH+'nu{}.png'.format(nu))
 
 def main():
-    os.system('mkdir -p plots/{}')
-    psi0  = dark_soliton(-10)
-    psi0 *= dark_soliton( 10)
-    plot(psi0,'plots/nu0.0.png',10000//2)
+    # Store the created plots here
+    os.system('mkdir -p ' + FIGURE_PATH)
 
-    plot_sym(0.3)
-    plot_sym(0.5)
-    plot_sym(0.8)
-    plot_sym(0.95)
+    psi0  = black_soliton(-10.) * black_soliton(10.)
+    run_and_plot(psi0, num_steps=100, fig_title=FIGURE_PATH+'nu0.0.png')
 
-    psi0  = grey_soliton( 0.3,  -10)
-    psi0 *= grey_soliton(-0.05,   -2)
-    psi0 *= grey_soliton( 0.967746031217134,  6)
+    run_and_plot_sym(0.3)
+    run_and_plot_sym(0.5)
+    run_and_plot_sym(0.8)
+    run_and_plot_sym(0.95)
 
-    plot(psi0,'plots/nu0.3nu0.05.png',10000,dt/2)
+    psi0  = (dark_soliton(-10., nu=0.3)
+             * dark_soliton(-2., nu=-0.05)
+             * dark_soliton(6., nu=0.967746031217134))
+
+    run_and_plot(psi0, num_steps=3000, fig_title=FIGURE_PATH+'nu0.3nu0.05.png')
 
 if __name__ == "__main__":
     main()
