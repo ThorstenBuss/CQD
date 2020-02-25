@@ -1,3 +1,9 @@
+#####################################
+# 2D GPE model of vortices in a BEC #
+#####################################
+
+# .. Layout Setup .............................................................
+
 import matplotlib as mpl
 mpl.rcParams['legend.handlelength'] = 0.5
 pgf_with_rc_fonts = {
@@ -10,13 +16,6 @@ mpl.rcParams.update(pgf_with_rc_fonts)
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
-import h5py as h
-import scipy.special as special
-import scipy.ndimage as ndimage
-from scipy.optimize import curve_fit, newton
-from scipy.interpolate import interp1d
-import scipy.optimize as optimization
-import timeit
 import os
 from tqdm import tqdm
 
@@ -28,11 +27,10 @@ rc('font',**{'family':'serif','serif':['Computer Modern Roman'], 'size':myfontsi
 rc('text', usetex=True)
 rc('legend', fontsize=myfontsize)
 
+# .. Model Parameters .........................................................
 
-#####################################################################################
-#################### Define tools for the vortex grids #############################
-####################################################################################
 
+# .. Model utility functions ..................................................
 
 ### create a grid with homogeneous condensate background density
 def create_condensed_grid(nx_grid,ny_grid,N):
@@ -209,6 +207,8 @@ def create_2d_test_vortexpair_grid(nx_grid,ny_grid,num_vortex_pairs,N,g):
 
     return grid
 
+# .. Core functions and plotting ..............................................
+
 def TimeEvolution(psi0, g, tsteps_, dt_,dx):
     k = 2*np.pi*np.fft.fftfreq(len(psi0),d=dx)
     k = np.meshgrid(k,k)
@@ -322,7 +322,7 @@ def main(argv):
     print("Particle number on created vortex grid: " , calculate_particle_number(grid))
 
     plot(grid,nx_grid,ny_grid,0,xi)
-    for i in tqdm(range(1000)):
+    for i in tqdm(range(10)): # 1000
         grid = TimeEvolution(grid, g, 5, 0.002,1/xi)
         plot(grid,nx_grid,ny_grid,i+1,xi)
 

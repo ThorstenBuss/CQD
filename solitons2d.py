@@ -1,3 +1,9 @@
+#####################################
+# 2D GPE model of solitons in a BEC #
+#####################################
+
+# .. Layout Setup .............................................................
+
 import matplotlib as mpl
 mpl.rcParams['legend.handlelength'] = 0.5
 pgf_with_rc_fonts = {
@@ -19,6 +25,8 @@ rc('font',**{'family':'serif','serif':['Computer Modern Roman'], 'size':myfontsi
 rc('text', usetex=True)
 rc('legend', fontsize=myfontsize)
 
+# .. Model Parameters .........................................................
+
 dase = 'soliton2d'
 L       =  64
 npoints = 256
@@ -26,6 +34,8 @@ dx      = L/npoints
 
 grid = np.arange(-L/2,L/2,dx,complex)
 grid = np.meshgrid(grid,grid)
+
+# .. Model utility functions ..................................................
 
 def rand1d(x):
     ret = 0
@@ -60,6 +70,8 @@ def ring(R=5,nu=-0.5):
     r = np.sqrt(grid[0]*grid[0]+grid[1]*grid[1])
     ret = 1j*nu+1/gamma*np.tanh((r-R)/gamma)
     return ret*np.ones((npoints,npoints))
+
+# .. Core functions and plotting ..............................................
 
 def plot(grid,nx_grid,ny_grid,i):
     ##### Density #######################################
