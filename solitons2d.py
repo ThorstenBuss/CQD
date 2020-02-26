@@ -36,6 +36,12 @@ GRID        = np.meshgrid(GRID_AXIS, GRID_AXIS)     # The grid
 
 DT          = 0.01                                  # Time step size
 
+ITERATION_STEPS     = 500                           # Number of iteration steps
+STEPS_PER_ITERATION = 10                            # Number of time steps of
+                                                    # size DT per iteration
+# NOTE The total iteration time is then given by
+#      ITERATION_STEPS*STEPS_PER_ITERATION*DT.
+
 k = 2*np.pi*np.fft.fftfreq(N, d=DX)
 k = np.meshgrid(k,k)
 H_KIN = (k[0]*k[0] + k[1]*k[1]) / 2                 # Kinetic part of the
@@ -178,6 +184,7 @@ def main():
     os.system('mkdir -p {}/density'.format(FIGURE_PATH))
 
     # -- Initialization ---------------------------------------
+
     # Initialize two parallel black solitons
     psi = dark_soliton(z0=-10., nu=0.) * dark_soliton(z0=10., nu=0.)
     
@@ -197,10 +204,8 @@ def main():
     np.save('{}/{}'.format(DATA_PATH, 0), psi)
 
     # Propagate in time, plot and save results
-    for i in tqdm(range(500)):
-        psi = propagate_state(psi, num_steps=10, dt=DT)
-        # NOTE The total iteration time is given by 10*500*DT, as 10 time steps
-        #      of size DT are done in each iteration step.
+    for i in tqdm(range(ITERATION_STEPS)):
+        psi = propagate_state(psi, num_steps=STEPS_PER_ITERATION, dt=DT)
         plot(psi, i+1)
         np.save('{}/{}'.format(DATA_PATH, i+1), psi)
 

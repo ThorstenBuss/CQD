@@ -138,6 +138,13 @@ def run_and_plot(psi0, *, num_steps, dt=DT, file_name):
     plt.close()
 
 def run_and_plot_sym(nu, dt=DT):
+    """Creates a symmetric soliton configuration as initial state and runs the
+    model. Two solitons are placed at z0=+-10 with opposite velocities.
+    
+    Args:
+        nu (float): Greyness. One soliton gets nu, the other gets -nu
+        dt (float, optional): Time step size
+    """
     psi0  = dark_soliton(-10., nu=nu) * dark_soliton(10., nu=-nu)
     run_and_plot(psi0, num_steps=int(20/(nu*dt)),
                  file_name=FIGURE_PATH+'/nu{}.png'.format(nu))
@@ -179,6 +186,7 @@ def main():
 
     run_and_plot(psi0, num_steps=10000, dt=DT/2,
                  file_name=FIGURE_PATH+'/nu0.3nu0.05.png')
+    # NOTE Changing the `dt` argument also changes the time scale.
 
 if __name__ == "__main__":
     main()

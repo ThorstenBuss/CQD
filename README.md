@@ -21,9 +21,12 @@ For more detailed information on the configurations and the models themselves, h
 ## Simulation Results
 
 ### Solitons in a 2d BEC
+
 ![](example_plots/solitons2d_lines_density.gif) ![](example_plots/solitons2d_lines_phase.gif)
 
 ### Vortices in a 2d BEC
+
+![](example_plots/vortices2d_regular_density.gif) ![](example_plots/vortices2d_regular_phase.gif)
 
 __References:__
 * Sebastian Erne Diplomarbeit
