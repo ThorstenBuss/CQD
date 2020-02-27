@@ -137,32 +137,38 @@ def run_and_plot(psi0, *, num_steps, dt=DT, file_name):
     plt.savefig(file_name, dpi=300, bbox_inches='tight')
     plt.close()
 
-def plot_soliton(nu1,nu2):
+def plot_initial_state(nu1,nu2):
+    """Plots initial state.
+    
+    Args:
+        nu1 (float): Greyness first soliton
+        nu2 (float): Greyness second soliton
+    """
+    psi1  = dark_soliton(0, nu1)
+    psi2  = dark_soliton(0, nu2)
+
     fig, ax1=plt.subplots(2,figsize=(10,10))
 
-    titlesize=20
-    labelsize=20
     color = 'tab:red'
-    ax1[0].plot(GRID, abs_square(dark_soliton(z0=0, nu=nu1)), color=color)
-    ax1[1].plot(GRID, abs_square(dark_soliton(z0=0, nu=nu2)), color=color)
+    ax1[0].plot(np.real(GRID), np.real(abs_square(psi1)), color=color)
+    ax1[1].plot(np.real(GRID), np.real(abs_square(psi2)), color=color)
     
     ax1[0].tick_params(axis='y', labelcolor=color)
     ax1[1].tick_params(axis='y', labelcolor=color)
     
-    ax1[0].tick_params(labelsize=labelsize)
-    ax1[1].tick_params(labelsize=labelsize)
+    ax1[0].tick_params(labelsize=myfontsize)
+    ax1[1].tick_params(labelsize=myfontsize)
     
     ax1[0].set_ylim(-0.1/np.pi, 1+0.1/np.pi)
     ax1[1].set_ylim(-0.1/np.pi, 1+0.1/np.pi)
     
-    ax1[0].set_title('v=0.5', fontsize=titlesize, loc='left')
-    ax1[1].set_title('v=0', fontsize= titlesize, loc='left')
+    ax1[0].set_title('$\\nu={}$'.format(nu1), fontsize=myfontsize, loc='left')
+    ax1[1].set_title('$\\nu={}$'.format(nu2), fontsize=myfontsize, loc='left')
     
-    ax1[0].set_xlabel('x', fontsize=labelsize)
-    ax1[1].set_xlabel('x', fontsize=labelsize)
+    ax1[1].set_xlabel('$x$ $[\\xi]$', fontsize=myfontsize)
     
-    ax1[0].set_ylabel('$\phi^2$', color=color, fontsize=labelsize)
-    ax1[1].set_ylabel('$\phi^2$', color=color, fontsize=labelsize)
+    ax1[0].set_ylabel('$\phi^2$', color=color, fontsize=myfontsize)
+    ax1[1].set_ylabel('$\phi^2$', color=color, fontsize=myfontsize)
 
 
     ax20= ax1[0].twinx()
@@ -172,19 +178,36 @@ def plot_soliton(nu1,nu2):
     ax20.set_ylim(-0.1, np.pi+0.1)
     ax21.set_ylim(-0.1, np.pi+0.1)
     
-    ax20.set_ylabel('$\Theta$', color=color, fontsize=labelsize)
-    ax21.set_ylabel('$\Theta$', color=color, fontsize=labelsize)
+    ax20.set_ylabel('$\Theta$', color=color, fontsize=myfontsize)
+    ax21.set_ylabel('$\Theta$', color=color, fontsize=myfontsize)
     
     ax20.tick_params(axis='y', labelcolor=color)
     ax21.tick_params(axis='y', labelcolor=color)
     
-    ax20.tick_params(labelsize=labelsize)
-    ax21.tick_params(labelsize=labelsize)
+    ax20.tick_params(labelsize=myfontsize)
+    ax21.tick_params(labelsize=myfontsize)
     
-    ax20.plot(GRID, np.angle(dark_soliton(z0=0, nu=nu2)), color=color)
-    ax21.plot(GRID, np.angle(dark_soliton(z0=0, nu=nu2)), color=color)
+    ax20.plot(np.real(GRID), np.real(np.angle(psi1)), color=color)
+    ax21.plot(np.real(GRID), np.real(np.angle(psi2)), color=color)
     
-    plt.savefig(FIGURE_PATH + '/Soliton.png',format = 'png', dpi=300)   
+    plt.savefig(FIGURE_PATH + '/Soliton.png',format = 'png', dpi=300)
+    plt.close()
+
+    plt.plot(np.real(GRID), np.real(np.angle(psi1)),label='$\\nu=0$')
+    plt.plot(np.real(GRID), np.real(np.angle(psi2)),label='$\\nu=0.5$')
+    plt.xlabel('$x$ $[\\xi]$')
+    plt.ylabel('Phase')
+    plt.legend()
+    plt.savefig(FIGURE_PATH+'/phase.png', dpi=300, bbox_inches='tight')
+    plt.close()
+
+    plt.plot(np.real(GRID), np.real(abs_square(psi1)),label='$\\nu=0$')
+    plt.plot(np.real(GRID), np.real(abs_square(psi2)),label='$\\nu=0.5$')
+    plt.xlabel('$x$ $[\\xi]$')
+    plt.ylabel('Density')
+    plt.legend()
+    plt.savefig(FIGURE_PATH+'/density.png', dpi=300, bbox_inches='tight')
+    plt.close()
 
 def run_and_plot_sym(nu, dt=DT):
     """Creates a symmetric soliton configuration as initial state and runs the
@@ -202,26 +225,7 @@ def main():
     # Store the created plots here
     os.system('mkdir -p {}'.format(FIGURE_PATH))
 
-    psi0  = black_soliton(0)
-    psi1  = dark_soliton(0,0.5)
-
-    plt.plot(np.real(GRID), np.real(np.angle(psi0)),label='$\\nu=0$')
-    plt.plot(np.real(GRID), np.real(np.angle(psi1)),label='$\\nu=0.5$')
-    plt.xlabel('$x$ $[\\xi]$')
-    plt.ylabel('Phase')
-    plt.legend()
-    plt.savefig(FIGURE_PATH+'/phase.png', dpi=300, bbox_inches='tight')
-    plt.close()
-
-    plt.plot(np.real(GRID), np.real(abs_square(psi0)),label='$\\nu=0$')
-    plt.plot(np.real(GRID), np.real(abs_square(psi1)),label='$\\nu=0.5$')
-    plt.xlabel('$x$ $[\\xi]$')
-    plt.ylabel('Density')
-    plt.legend()
-    plt.savefig(FIGURE_PATH+'/density.png', dpi=300, bbox_inches='tight')
-    plt.close()
-
-    plot_soliton(0.5,0)
+    plot_initial_state(0.,0.5)
 
     psi0  = black_soliton(-10.) * black_soliton(10.)
     run_and_plot(psi0, num_steps=100, file_name=FIGURE_PATH+'/nu0.0.png')
