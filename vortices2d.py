@@ -38,7 +38,7 @@ XI  = 4.        # healing length, resolved with 4 grid points, if you use a
 DT = 0.002      # time step size
 DX = 1. / XI    # grid cell size
 
-ITERATION_STEPS     = 500                           # Number of iteration steps
+ITERATION_STEPS     = 300                           # Number of iteration steps
 STEPS_PER_ITERATION = 10                            # Number of time steps of
                                                     # size DT per iteration
 # NOTE The total iteration time is then given by
@@ -262,18 +262,6 @@ def h_pot(psi):
     """
     return np.conjugate(psi)*psi
 
-def noise(sigma):
-    """Returns a NXxNY grid containing gaussian distributed values with mean of
-    1 and the given std.
-    
-    Args:
-        sigma (float): Standard deviation of the gaussian distribution
-    
-    Returns:
-        2d array: Grid containing random values around 1
-    """
-    return np.random.normal(1, sigma, (NX,NY)).astype(complex)
-
 # .. Core functions and plotting ..............................................
 
 def propagate_state(psi0, *, num_steps, dt=DT, g=1.):
@@ -387,9 +375,6 @@ def main():
         # One of the initialization modes must be chosen. Don't continue.
         print("Error, please choose one of the available initialization modes!")
         return
-
-    # Add noise
-    grid *= noise(sigma=0.02)
 
     # Normalize to initially set particle number
     grid *= np.sqrt(N / calculate_particle_number(grid))

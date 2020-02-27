@@ -28,6 +28,9 @@ For more detailed information on the configurations and the models themselves, h
 
 ![](example_plots/vortices2d_regular_density.gif) ![](example_plots/vortices2d_regular_phase.gif)
 
+![](example_plots/vortices2d_regular_offset_density.gif) ![](example_plots/vortices2d_regular_offset_phase.gif)
+
+
 __References:__
 * Sebastian Erne Diplomarbeit
 * M. Karl and T. Gasenzer New. J. Phys. 19:093014 (2017)
