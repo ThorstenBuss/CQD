@@ -179,6 +179,9 @@ def main():
 
     run_and_plot(psi0, num_steps=10000, dt=DT/2,
                  fig_title=FIGURE_PATH+'nu0.3nu0.05.png')
+    
+    run_and_plot(dark_soliton(0), num_steps=1000, dt=DT,
+                 fig_title=FIGURE_PATH+'boundary')
 
 if __name__ == "__main__":
     main()
