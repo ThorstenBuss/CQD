@@ -1,81 +1,140 @@
-'''import matplotlib as mpl
+#####################################
+# 1D GPE model of solitons in a BEC #
+#####################################
+
+# .. Layout Setup .............................................................
+
+import matplotlib as mpl
 mpl.rcParams['legend.handlelength'] = 0.5
 pgf_with_rc_fonts = {
     "font.family": "serif",
     "font.serif": [],
     "font.sans-serif": ["DejaVu Sans"]
 }
-mpl.rcParams.update(pgf_with_rc_fonts)'''
+mpl.rcParams.update(pgf_with_rc_fonts)
 
 import matplotlib.pyplot as plt
-import scipy.linalg as LA
 import numpy as np
 import os
 
-myfontsize = 9
+myfontsize = 15
 
-'''from matplotlib import rc
-rc('font',**{'family':'serif','serif':['Computer Modern Roman'], 'size':myfontsize})
+from matplotlib import rc
+rc('font', **{'family':'serif','serif':['Computer Modern Roman'],
+   'size':myfontsize})
 rc('text', usetex=True)
-rc('legend', fontsize=myfontsize)'''
+rc('legend', fontsize=myfontsize)
 
-L       =  40
-npoints = 600
-dt      =   0.01
+# .. Model Parameters .........................................................
 
-dx      = L/npoints
-grid  = np.arange(-L/2,L/2,dx,complex)
+L       = 40                                        # Domain size
+N       = 600                                       # Number of grid points
+DX      = L / N                                     # Cell size
+GRID    = np.arange(-L/2, L/2, DX, dtype=complex)   # The grid
 
-def H1diag(t):
-    k = 2*np.pi*np.fft.fftfreq(npoints,d=dx)
-    Es = k*k/2
-    return Es
+DT      = 0.01                                      # Time step size
 
-def H2diag(t,psi):
-    return np.conjugate(psi)*psi
+H_KIN   = 0.5*(2*np.pi*np.fft.fftfreq(N, d=DX))**2  # Kinetic part of the
+                                                    # Hamiltonian
 
-def TimeStap(psi,t):
-    psi  = np.exp(-1j*(dt/2)*H2diag(t,psi))*psi
-    t   += dt/2
-    psi_ = np.fft.fft(psi)
-    psi_ = np.exp(-1j*dt*H1diag(t))*psi_
-    t   += dt/2
-    psi  = np.fft.ifft(psi_)
-    psi  = np.exp(-1j*(dt/2)*H2diag(t,psi))*psi
-    return psi
+FIGURE_PATH = "plots/solitons1d"                    # Where to store the figures
 
-def grey_soliton(nu=0.5,z0=0):
-    gamma=1/np.sqrt(1-nu**2)
-    return 1j*nu+1/gamma*np.tanh((grid-z0)/(gamma))
+# .. Model utility functions ..................................................
 
-def dark_soliton(z0=0):
-    return grey_soliton(nu=0,z0=z0)
+def abs_square(arr):
+    """Returns the absolute square of a complex array.
+    
+    Args:
+        arr (np.array): Input array
+    
+    Returns:
+        np.array: Absolute square of input
+    """
+    return np.conjugate(arr)*arr
 
-def TimeEvolution(psi0, tsteps_, dt_=dt):
-    all_psis = np.zeros((tsteps_+1,npoints))
-    t = 0
-    psi = np.exp(-1j*(dt_/2)*H2diag(t,psi0))*psi0
-    t += dt_/2
-    all_psis[0] = np.real(np.conjugate(psi)*psi)
-    for i in range(tsteps_):
-        psi_ = np.fft.fft(psi)
-        psi_ = np.exp(-1j*dt_*H1diag(t))*psi_
-        t += dt_/2
-        psi  = np.fft.ifft(psi_)
-        psi  = np.exp(-1j*dt_*H2diag(t,psi))*psi
-        t += dt_/2
-        all_psis[i+1] = np.real(np.conjugate(psi)*psi)
-    return all_psis
+def h_pot(psi):
+    """Returns the potential part of the Hamiltonian (in diagonal form) which
+    is given by the absolute square of the wavefunction.
+    
+    Args:
+        psi (np.array): State
+    
+    Returns:
+        np.array: Potential part of the Hamiltonian
+    """
+    return abs_square(psi)
 
-def plot(psi0, name, tsteps_, dt_=dt):
-    all_psis = TimeEvolution(psi0, tsteps_, dt_)
-    plt.imshow(all_psis, cmap=plt.get_cmap("BuPu"), origin='lower', 
-           extent=[-L/2,L/2-dx, dt_/2, (tsteps_+1/2)*dt_], aspect='auto')
+def dark_soliton(z0, nu=0.5):
+    """Returns a dark (grey) soliton.
+    
+    Args:
+        z0 (float): Initial position
+        nu (float, optional): Greyness
+    
+    Returns:
+        Dark soliton
+    """
+    gamma = 1./np.sqrt(1.-nu**2)
+    return 1j*nu + np.tanh((GRID-z0)/gamma)/gamma
+
+def black_soliton(z0):
+    """Returns a black soliton, i.e., a stationary dark soliton.
+    
+    Args:
+        z0 (float): Initial position
+    
+    Returns:
+        Black soliton
+    """
+    return dark_soliton(z0, nu=0.)
+
+# .. Core functions and plotting ..............................................
+
+def time_evolution(psi0, num_steps, dt=DT):
+    """Calculates the GPE time evolution of the probability density given an
+    initial state using the split-step fourier method.
+    
+    Args:
+        psi0 (np.array): Initial state
+        num_steps (int): Number of iteration steps
+        dt (float, optional): Time step size
+    
+    Returns:
+        Probability density for all iteration times; states are sorted in
+        columns in temporal order.
+    """
+    prob_densities = np.zeros((num_steps+1, N))
+    psi = psi0
+    prob_densities[0] = np.real(abs_square(psi))
+
+    for i in range(num_steps):
+        psi = np.fft.fft(psi)
+        psi = np.exp(-1j*dt*H_KIN)*psi
+        psi = np.fft.ifft(psi)
+        psi = np.exp(-1j*dt*h_pot(psi))*psi
+        prob_densities[i+1] = np.real(abs_square(psi))
+
+    return prob_densities
+
+def run_and_plot(psi0, *, num_steps, dt=DT, file_name):
+    """Runs the model given an initial state and plots the temporal
+    development of the probability density.
+    
+    Args:
+        psi0 (np.array): Initial state
+        num_steps (int): Number of iteration steps
+        dt (float, optional): Time step size
+        file_name (str): Figure title
+    """
+    prob_densities = time_evolution(psi0, num_steps=num_steps, dt=dt)
+
+    plt.imshow(prob_densities, cmap=plt.get_cmap("BuPu"), origin='lower', 
+               extent=[-L/2, L/2-DX, dt/2, (num_steps+1/2)*dt], aspect='auto')
     plt.xlabel('$x$ $[\\xi]$')
     plt.ylabel('t')
     cbar = plt.colorbar()
-    cbar.set_label(r'Density',labelpad=5,fontsize=20)
-    plt.savefig(name,dpi=300)
+    cbar.set_label(r'Density', labelpad=5, fontsize=myfontsize)
+    plt.savefig(file_name, dpi=300, bbox_inches='tight')
     plt.close()
 
 def plot_soliton(nu1,nu2):
@@ -84,8 +143,8 @@ def plot_soliton(nu1,nu2):
     titlesize=20
     labelsize=20
     color = 'tab:red'
-    ax1[0].plot(grid,np.abs(grey_soliton(nu1,z0=0))**2,color=color)
-    ax1[1].plot(grid,np.abs(grey_soliton(nu2,z0=0))**2,color=color)
+    ax1[0].plot(GRID, abs_square(dark_soliton(z0=0, nu=nu1)), color=color)
+    ax1[1].plot(GRID, abs_square(dark_soliton(z0=0, nu=nu2)), color=color)
     
     ax1[0].tick_params(axis='y', labelcolor=color)
     ax1[1].tick_params(axis='y', labelcolor=color)
@@ -93,28 +152,28 @@ def plot_soliton(nu1,nu2):
     ax1[0].tick_params(labelsize=labelsize)
     ax1[1].tick_params(labelsize=labelsize)
     
-    ax1[0].set_ylim(-0.1/np.pi,1+0.1/np.pi)
-    ax1[1].set_ylim(-0.1/np.pi,1+0.1/np.pi)
+    ax1[0].set_ylim(-0.1/np.pi, 1+0.1/np.pi)
+    ax1[1].set_ylim(-0.1/np.pi, 1+0.1/np.pi)
     
-    ax1[0].set_title('v=0.5',fontsize=titlesize,loc='left')
-    ax1[1].set_title('v=0',fontsize= titlesize,loc='left')
+    ax1[0].set_title('v=0.5', fontsize=titlesize, loc='left')
+    ax1[1].set_title('v=0', fontsize= titlesize, loc='left')
     
-    ax1[0].set_xlabel('x',fontsize=labelsize)
-    ax1[1].set_xlabel('x',fontsize=labelsize)
+    ax1[0].set_xlabel('x', fontsize=labelsize)
+    ax1[1].set_xlabel('x', fontsize=labelsize)
     
-    ax1[0].set_ylabel('$\phi^2$', color=color,fontsize=labelsize)
-    ax1[1].set_ylabel('$\phi^2$', color=color,fontsize=labelsize)
+    ax1[0].set_ylabel('$\phi^2$', color=color, fontsize=labelsize)
+    ax1[1].set_ylabel('$\phi^2$', color=color, fontsize=labelsize)
 
 
     ax20= ax1[0].twinx()
     ax21= ax1[1].twinx()
 
     color = 'tab:blue'
-    ax20.set_ylim(-0.1,np.pi+0.1)
-    ax21.set_ylim(-0.1,np.pi+0.1)
+    ax20.set_ylim(-0.1, np.pi+0.1)
+    ax21.set_ylim(-0.1, np.pi+0.1)
     
-    ax20.set_ylabel('$\Theta$', color=color,fontsize=labelsize)
-    ax21.set_ylabel('$\Theta$', color=color,fontsize=labelsize)
+    ax20.set_ylabel('$\Theta$', color=color, fontsize=labelsize)
+    ax21.set_ylabel('$\Theta$', color=color, fontsize=labelsize)
     
     ax20.tick_params(axis='y', labelcolor=color)
     ax21.tick_params(axis='y', labelcolor=color)
@@ -122,34 +181,63 @@ def plot_soliton(nu1,nu2):
     ax20.tick_params(labelsize=labelsize)
     ax21.tick_params(labelsize=labelsize)
     
-    ax20.plot(grid,np.angle(grey_soliton(nu1,z0=0)),color=color)
-    ax21.plot(grid,np.angle(grey_soliton(nu2,z0=0)),color=color)
+    ax20.plot(GRID, np.angle(dark_soliton(z0=0, nu=nu2)), color=color)
+    ax21.plot(GRID, np.angle(dark_soliton(z0=0, nu=nu2)), color=color)
     
-    plt.savefig('plots/Soliton.png',format = 'png', dpi=600)   
+    plt.savefig(FIGURE_PATH + '/Soliton.png',format = 'png', dpi=300)   
+
+def run_and_plot_sym(nu, dt=DT):
+    """Creates a symmetric soliton configuration as initial state and runs the
+    model. Two solitons are placed at z0=+-10 with opposite velocities.
     
-def plot_sym(nu):
-    psi0  = grey_soliton(nu,-10)
-    psi0 *= grey_soliton(-nu, 10)
-    plot(psi0,'plots/nu{}.png'.format(nu),tsteps_=int(20/(nu*dt)))
+    Args:
+        nu (float): Greyness. One soliton gets nu, the other gets -nu
+        dt (float, optional): Time step size
+    """
+    psi0  = dark_soliton(-10., nu=nu) * dark_soliton(10., nu=-nu)
+    run_and_plot(psi0, num_steps=int(20/(nu*dt)),
+                 file_name=FIGURE_PATH+'/nu{}.png'.format(nu))
 
 def main():
-    os.system('mkdir -p plots/{}')
-    psi0  = dark_soliton(-10)
-    psi0 *= dark_soliton( 10)
-    plot(psi0,'plots/nu0.0.png',10000//2)
+    # Store the created plots here
+    os.system('mkdir -p {}'.format(FIGURE_PATH))
 
-    plot_sym(0.3)
-    plot_sym(0.5)
-    plot_sym(0.8)
-    plot_sym(0.95)
+    psi0  = black_soliton(0)
+    psi1  = dark_soliton(0,0.5)
 
-    psi0  = grey_soliton( 0.3,  -10)
-    psi0 *= grey_soliton(-0.05,   -2)
-    psi0 *= grey_soliton( 0.967746031217134,  6)
+    plt.plot(np.real(GRID), np.real(np.angle(psi0)),label='$\\nu=0$')
+    plt.plot(np.real(GRID), np.real(np.angle(psi1)),label='$\\nu=0.5$')
+    plt.xlabel('$x$ $[\\xi]$')
+    plt.ylabel('Phase')
+    plt.legend()
+    plt.savefig(FIGURE_PATH+'/phase.png', dpi=300, bbox_inches='tight')
+    plt.close()
 
-    plot(psi0,'plots/nu0.3nu0.05.png',10000,dt/2)
-    
+    plt.plot(np.real(GRID), np.real(abs_square(psi0)),label='$\\nu=0$')
+    plt.plot(np.real(GRID), np.real(abs_square(psi1)),label='$\\nu=0.5$')
+    plt.xlabel('$x$ $[\\xi]$')
+    plt.ylabel('Density')
+    plt.legend()
+    plt.savefig(FIGURE_PATH+'/density.png', dpi=300, bbox_inches='tight')
+    plt.close()
+
     plot_soliton(0.5,0)
+
+    psi0  = black_soliton(-10.) * black_soliton(10.)
+    run_and_plot(psi0, num_steps=100, file_name=FIGURE_PATH+'/nu0.0.png')
+
+    run_and_plot_sym(0.3)
+    run_and_plot_sym(0.5)
+    run_and_plot_sym(0.8)
+    run_and_plot_sym(0.95)
+
+    psi0  = (dark_soliton(-10., nu=0.3)
+             * dark_soliton(-2., nu=-0.05)
+             * dark_soliton(6., nu=0.967746031217134))
+
+    run_and_plot(psi0, num_steps=10000, dt=DT/2,
+                 file_name=FIGURE_PATH+'/nu0.3nu0.05.png')
+    # NOTE Changing the `dt` argument also changes the time scale.
 
 if __name__ == "__main__":
     main()
