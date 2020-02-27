@@ -342,11 +342,11 @@ def main():
 
     # Calculate homogeneous background density
     rho = 1. / (2*G*XI**2)
-    print("Homogeneous background density:" , rho)
+    print("Homogeneous background density: ", rho)
     
     # Calculate total particle number of simulation
     N = rho * NX * NY
-    print("Particle number: " , N)
+    print("Particle number: ", N)
 
     # -- Initialization ---------------------------------------
 
