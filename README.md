@@ -1,28 +1,33 @@
 # CQD - The Gross-Pitaevskii equation (GPE): Dynamics of solitons and vortices
-The GPE is a mean field equation that has been incredibly successful in describing the dynamics
-of Bose Einstein condensates (BECs). The equation features a non-linear term and thus allows for
-stable soliton solutions in 1D and additional topological defects such as vortices in 2D. The goal of
-this project is to study these phenomena using the split-step Fourier method.
+The GPE is a mean field equation that has been incredibly successful in describing the dynamics of Bose Einstein condensates (BECs). The equation features a non-linear term and thus allows for stable soliton solutions in 1D and additional topological defects such as vortices in 2D. The goal of this project is to study these phenomena using the split-step Fourier method.
 
-Literature: Sebastian Erne Diplomarbeit (provided), M. Karl and T. Gasenzer New. J. Phys. 19:093014 (2017) 
+We provide three configurable models:
+1. [Solitons in a 1d BEC](https://github.com/ThorstenBuss/CQD/blob/master/solitons1d.py)
+2. [Solitons in a 2d BEC](https://github.com/ThorstenBuss/CQD/blob/master/solitons2d.py)
+3. [Vortices in a 2d BEC](https://github.com/ThorstenBuss/CQD/blob/master/vortices2d.py)
 
-Methods:
-* Mean field approximation
-* discretization
-* non-linear partial differential equations
-* split-step Fourier method
+## Running a model
 
-Steps:
-* Simulate the evolution of dark solitons in a homogeneous (no trapping potential) 1D Bose gas. Use single and multiple grey solitons and study their propagation.
-* Study the dynamics of solitons in a homogeneous 2D Bose gas.
-* In 2D other topological defects, called vortices can be present. Use the given routine to initialize a 2D gas containing vortices (and anti-vortices) and visualize and analyze their dynamics. What happens if you initially put some singly quantized vortices (and no anti-vortices)? What happens to vortices with winding number higher than 1? What happens if you start with a vortex-anti-vortex pair or several of them?
+In order to run the scripts, copy the files to a newly created project directory and simply use
 
-_Hint on spatial and temporal resolution_: It will be important to choose the right spatial resolution
-such that the healing length is well resolved. Since you don’t want to go to huge grid sizes due to
-computational limitations, this will limit the number of vortices you can sensibly use.
+```bash
+$ python <model_name>
+```
 
-_Hint on initial conditions in 2D_: The idea in the provided code is that the initial condition respects
-the periodic boundary conditions (which the FFT method imposes), which they unfortunately do
-not. (Is it actually possible topologically possible to have vortices and still maintain periodic
-boundaries?) This causes artefacts at the boundaries, which, however, for large enough grids
-should not overlay the vortex dynamics completely.
+Here, replace `model_name` by either `solitons1d`, `solitons2d`, or `vortices2d`.
+
+For more detailed information on the configurations and the models themselves, have a look at the [project report]() and the comments within the scripts.
+
+## Simulation Results
+
+### Solitons in a 2d BEC
+
+![](example_plots/solitons2d_lines_density.gif) ![](example_plots/solitons2d_lines_phase.gif)
+
+### Vortices in a 2d BEC
+
+![](example_plots/vortices2d_regular_density.gif) ![](example_plots/vortices2d_regular_phase.gif)
+
+__References:__
+* Sebastian Erne Diplomarbeit
+* M. Karl and T. Gasenzer New. J. Phys. 19:093014 (2017)
