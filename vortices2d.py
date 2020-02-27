@@ -38,7 +38,11 @@ XI  = 4.        # healing length, resolved with 4 grid points, if you use a
 DT = 0.002      # time step size
 DX = 1. / XI    # grid cell size
 
-ITERATION_STEPS     = 300                           # Number of iteration steps
+# NOTE As the cell size is defined through the healing length, the total domain
+#      size (in x-direction) is given by the fraction NX / XI. It is
+#      recommended to keep the fraction at a constant value.
+
+ITERATION_STEPS     = 500                           # Number of iteration steps
 STEPS_PER_ITERATION = 10                            # Number of time steps of
                                                     # size DT per iteration
 # NOTE The total iteration time is then given by
