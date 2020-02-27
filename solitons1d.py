@@ -181,7 +181,7 @@ def main():
                  fig_title=FIGURE_PATH+'nu0.3nu0.05.png')
     
     run_and_plot(dark_soliton(0), num_steps=1000, dt=DT,
-                 fig_title=FIGURE_PATH+'boundary')
+                 fig_title=FIGURE_PATH+'boundary.png')
 
 if __name__ == "__main__":
     main()
