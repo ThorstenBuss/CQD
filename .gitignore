@@ -1,8 +1,5 @@
 .vscode
 .ipynb_checkpoints
-*.svg
-*.pdf
-!report.pdf
 data
 plots
 html
