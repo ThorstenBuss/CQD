@@ -137,6 +137,20 @@ def run_and_plot(psi0, *, num_steps, dt=DT, file_name):
     plt.savefig(file_name, dpi=300, bbox_inches='tight')
     plt.close()
 
+def run_and_plot_sym(nu, dt=DT):
+    """Creates a symmetric soliton configuration as initial state and runs the
+    model. Two solitons are placed at z0=+-10 with opposite velocities.
+
+    NOTE nu must be larger than zero!
+    
+    Args:
+        nu (float): Greyness. One soliton gets nu, the other gets -nu
+        dt (float, optional): Time step size
+    """
+    psi0  = dark_soliton(-10., nu=nu) * dark_soliton(10., nu=-nu)
+    run_and_plot(psi0, num_steps=int(20/(nu*dt)),
+                 file_name=FIGURE_PATH+'/nu{}.png'.format(nu))
+
 def plot_initial_state(nu1,nu2):
     """Plots initial state.
 
@@ -209,18 +223,6 @@ def plot_initial_state(nu1,nu2):
     plt.savefig(FIGURE_PATH+'/density.png', dpi=300, bbox_inches='tight')
     plt.close()
 
-def run_and_plot_sym(nu, dt=DT):
-    """Creates a symmetric soliton configuration as initial state and runs the
-    model. Two solitons are placed at z0=+-10 with opposite velocities.
-
-    Args:
-        nu (float): Greyness. One soliton gets nu, the other gets -nu
-        dt (float, optional): Time step size
-    """
-    psi0  = dark_soliton(-10., nu=nu) * dark_soliton(10., nu=-nu)
-    run_and_plot(psi0, num_steps=int(20/(nu*dt)),
-                 file_name=FIGURE_PATH+'/nu{}.png'.format(nu))
-
 def main():
     # Store the created plots here
     os.system('mkdir -p {}'.format(FIGURE_PATH))
@@ -228,7 +230,7 @@ def main():
     plot_initial_state(0.,0.5)
 
     psi0  = black_soliton(-10.) * black_soliton(10.)
-    run_and_plot(psi0, num_steps=100, file_name=FIGURE_PATH+'/nu0.0.png')
+    run_and_plot(psi0, num_steps=1000, file_name=FIGURE_PATH+'/nu0.0.png')
 
     run_and_plot_sym(0.3)
     run_and_plot_sym(0.5)

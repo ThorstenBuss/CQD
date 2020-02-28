@@ -186,7 +186,7 @@ def main():
     # -- Initialization ---------------------------------------
 
     # Initialize two parallel black solitons
-    psi = dark_soliton(z0=-10., nu=0.) * dark_soliton(z0=10., nu=0.)
+    psi = dark_soliton(z0=-10., nu=0.) * dark_soliton(z0=10., nu=-0.)
     
     # Initialize a ring-like grey soliton
     # psi = ring(R=5., nu=-0.5)
