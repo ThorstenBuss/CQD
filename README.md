@@ -20,13 +20,21 @@ For more detailed information on the configurations and the models themselves, h
 
 ## Simulation Results
 
+Have a look at the [project report](report.pdf) for theoretical background and a detailed analysis.
+
 ### Solitons in a 2d BEC
+
+The line-structure of the solitons breaks down to single-quantized vortex-antivortex pairs.
 
 ![](example_plots/solitons2d_lines_density.gif) ![](example_plots/solitons2d_lines_phase.gif)
 
 ### Vortices in a 2d BEC
 
+Vortices and anti-vortices arranged on a perfect regular lattice exhibit stable periodic cycles.
+
 ![](example_plots/vortices2d_regular_density.gif) ![](example_plots/vortices2d_regular_phase.gif)
+
+When the vortex positions are slightly disturbed they decay to lower-quantized vortices.
 
 ![](example_plots/vortices2d_regular_offset_density.gif) ![](example_plots/vortices2d_regular_offset_phase.gif)
 
