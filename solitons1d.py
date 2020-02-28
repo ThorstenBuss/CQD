@@ -43,10 +43,10 @@ FIGURE_PATH = "plots/solitons1d"                    # Where to store the figures
 
 def abs_square(arr):
     """Returns the absolute square of a complex array.
-    
+
     Args:
         arr (np.array): Input array
-    
+
     Returns:
         np.array: Absolute square of input
     """
@@ -55,10 +55,10 @@ def abs_square(arr):
 def h_pot(psi):
     """Returns the potential part of the Hamiltonian (in diagonal form) which
     is given by the absolute square of the wavefunction.
-    
+
     Args:
         psi (np.array): State
-    
+
     Returns:
         np.array: Potential part of the Hamiltonian
     """
@@ -66,11 +66,11 @@ def h_pot(psi):
 
 def dark_soliton(z0, nu=0.5):
     """Returns a dark (grey) soliton.
-    
+
     Args:
         z0 (float): Initial position
         nu (float, optional): Greyness
-    
+
     Returns:
         Dark soliton
     """
@@ -79,7 +79,7 @@ def dark_soliton(z0, nu=0.5):
 
 def black_soliton(z0):
     """Returns a black soliton, i.e., a stationary dark soliton.
-    
+
     Args:
         z0 (float): Initial position
     
@@ -93,12 +93,12 @@ def black_soliton(z0):
 def time_evolution(psi0, num_steps, dt=DT):
     """Calculates the GPE time evolution of the probability density given an
     initial state using the split-step fourier method.
-    
+
     Args:
         psi0 (np.array): Initial state
         num_steps (int): Number of iteration steps
         dt (float, optional): Time step size
-    
+
     Returns:
         Probability density for all iteration times; states are sorted in
         columns in temporal order.
@@ -119,7 +119,7 @@ def time_evolution(psi0, num_steps, dt=DT):
 def run_and_plot(psi0, *, num_steps, dt=DT, file_name):
     """Runs the model given an initial state and plots the temporal
     development of the probability density.
-    
+
     Args:
         psi0 (np.array): Initial state
         num_steps (int): Number of iteration steps
@@ -151,28 +151,83 @@ def run_and_plot_sym(nu, dt=DT):
     run_and_plot(psi0, num_steps=int(20/(nu*dt)),
                  file_name=FIGURE_PATH+'/nu{}.png'.format(nu))
 
-def main():
-    # Store the created plots here
-    os.system('mkdir -p {}'.format(FIGURE_PATH))
+def plot_initial_state(nu1,nu2):
+    """Plots initial state.
 
-    psi0  = black_soliton(0)
-    psi1  = dark_soliton(0,0.5)
+    Args:
+        nu1 (float): Greyness first soliton
+        nu2 (float): Greyness second soliton
+    """
+    psi1  = dark_soliton(0, nu1)
+    psi2  = dark_soliton(0, nu2)
 
-    plt.plot(np.real(GRID), np.real(np.angle(psi0)),label='$\\nu=0$')
-    plt.plot(np.real(GRID), np.real(np.angle(psi1)),label='$\\nu=0.5$')
+    fig, ax1=plt.subplots(2,figsize=(10,10))
+
+    color = 'tab:red'
+    ax1[0].plot(np.real(GRID), np.real(abs_square(psi1)), color=color)
+    ax1[1].plot(np.real(GRID), np.real(abs_square(psi2)), color=color)
+
+    ax1[0].tick_params(axis='y', labelcolor=color)
+    ax1[1].tick_params(axis='y', labelcolor=color)
+
+    ax1[0].tick_params(labelsize=myfontsize)
+    ax1[1].tick_params(labelsize=myfontsize)
+
+    ax1[0].set_ylim(-0.1/np.pi, 1+0.1/np.pi)
+    ax1[1].set_ylim(-0.1/np.pi, 1+0.1/np.pi)
+
+    ax1[0].set_title('$\\nu={}$'.format(nu1), fontsize=myfontsize, loc='left')
+    ax1[1].set_title('$\\nu={}$'.format(nu2), fontsize=myfontsize, loc='left')
+
+    ax1[1].set_xlabel('$x$ $[\\xi]$', fontsize=myfontsize)
+
+    ax1[0].set_ylabel('$\phi^2$', color=color, fontsize=myfontsize)
+    ax1[1].set_ylabel('$\phi^2$', color=color, fontsize=myfontsize)
+
+
+    ax20= ax1[0].twinx()
+    ax21= ax1[1].twinx()
+
+    color = 'tab:blue'
+    ax20.set_ylim(-0.1, np.pi+0.1)
+    ax21.set_ylim(-0.1, np.pi+0.1)
+
+    ax20.set_ylabel('$\Theta$', color=color, fontsize=myfontsize)
+    ax21.set_ylabel('$\Theta$', color=color, fontsize=myfontsize)
+
+    ax20.tick_params(axis='y', labelcolor=color)
+    ax21.tick_params(axis='y', labelcolor=color)
+
+    ax20.tick_params(labelsize=myfontsize)
+    ax21.tick_params(labelsize=myfontsize)
+
+    ax20.plot(np.real(GRID), np.real(np.angle(psi1)), color=color)
+    ax21.plot(np.real(GRID), np.real(np.angle(psi2)), color=color)
+
+    plt.savefig(FIGURE_PATH + '/Soliton.png',format = 'png', dpi=300)
+    plt.close()
+
+    plt.plot(np.real(GRID), np.real(np.angle(psi1)),label='$\\nu=0$')
+    plt.plot(np.real(GRID), np.real(np.angle(psi2)),label='$\\nu=0.5$')
     plt.xlabel('$x$ $[\\xi]$')
     plt.ylabel('Phase')
     plt.legend()
     plt.savefig(FIGURE_PATH+'/phase.png', dpi=300, bbox_inches='tight')
     plt.close()
 
-    plt.plot(np.real(GRID), np.real(abs_square(psi0)),label='$\\nu=0$')
-    plt.plot(np.real(GRID), np.real(abs_square(psi1)),label='$\\nu=0.5$')
+    plt.plot(np.real(GRID), np.real(abs_square(psi1)),label='$\\nu=0$')
+    plt.plot(np.real(GRID), np.real(abs_square(psi2)),label='$\\nu=0.5$')
     plt.xlabel('$x$ $[\\xi]$')
     plt.ylabel('Density')
     plt.legend()
     plt.savefig(FIGURE_PATH+'/density.png', dpi=300, bbox_inches='tight')
     plt.close()
+
+def main():
+    # Store the created plots here
+    os.system('mkdir -p {}'.format(FIGURE_PATH))
+
+    plot_initial_state(0.,0.5)
 
     psi0  = black_soliton(-10.) * black_soliton(10.)
     run_and_plot(psi0, num_steps=1000, file_name=FIGURE_PATH+'/nu0.0.png')
@@ -187,8 +242,11 @@ def main():
              * dark_soliton(6., nu=0.967746031217134))
 
     run_and_plot(psi0, num_steps=10000, dt=DT/2,
-                 file_name=FIGURE_PATH+'/nu0.3nu0.05.png')
+             file_name=FIGURE_PATH+'/nu0.3nu0.05.png')
     # NOTE Changing the `dt` argument also changes the time scale.
+    
+    run_and_plot(dark_soliton(0), num_steps=1000, dt=DT,
+                 file_name =FIGURE_PATH+'/boundary.png')
 
 if __name__ == "__main__":
     main()
