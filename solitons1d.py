@@ -242,8 +242,11 @@ def main():
              * dark_soliton(6., nu=0.967746031217134))
 
     run_and_plot(psi0, num_steps=10000, dt=DT/2,
-                 file_name=FIGURE_PATH+'/nu0.3nu0.05.png')
+             file_name=FIGURE_PATH+'/nu0.3nu0.05.png')
     # NOTE Changing the `dt` argument also changes the time scale.
+    
+    run_and_plot(dark_soliton(0), num_steps=1000, dt=DT,
+                 file_name =FIGURE_PATH+'/boundary.png')
 
 if __name__ == "__main__":
     main()
