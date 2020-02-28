@@ -16,7 +16,7 @@ $ python <model_name>
 
 Here, replace `model_name` by either `solitons1d`, `solitons2d`, or `vortices2d`.
 
-For more detailed information on the configurations and the models themselves, have a look at the [project report]() and the comments within the scripts.
+For more detailed information on the configurations and the models themselves, have a look at the [project report](report.pdf) and the comments within the scripts.
 
 ## Simulation Results
 
