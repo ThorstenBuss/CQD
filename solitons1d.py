@@ -140,6 +140,8 @@ def run_and_plot(psi0, *, num_steps, dt=DT, file_name):
 def run_and_plot_sym(nu, dt=DT):
     """Creates a symmetric soliton configuration as initial state and runs the
     model. Two solitons are placed at z0=+-10 with opposite velocities.
+
+    NOTE nu must be larger than zero!
     
     Args:
         nu (float): Greyness. One soliton gets nu, the other gets -nu
@@ -173,7 +175,7 @@ def main():
     plt.close()
 
     psi0  = black_soliton(-10.) * black_soliton(10.)
-    run_and_plot(psi0, num_steps=100, file_name=FIGURE_PATH+'/nu0.0.png')
+    run_and_plot(psi0, num_steps=1000, file_name=FIGURE_PATH+'/nu0.0.png')
 
     run_and_plot_sym(0.3)
     run_and_plot_sym(0.5)
