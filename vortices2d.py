@@ -337,8 +337,8 @@ def plot(grid, *, nx_grid, ny_grid, xi, file_name):
 
 def main():
     # Create directories to store figures in
-    os.system('mkdir -p {}/phase'.format(FIGURE_PATH))
-    os.system('mkdir -p {}/density'.format(FIGURE_PATH))
+    os.makedirs(FIGURE_PATH + '/phase', exist_ok=True)
+    os.makedirs(FIGURE_PATH + '/density', exist_ok=True)
 
     # Calculate homogeneous background density
     rho = 1. / (2*G*XI**2)

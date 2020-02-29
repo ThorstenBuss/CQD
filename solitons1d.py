@@ -131,7 +131,7 @@ def run_and_plot(psi0, *, num_steps, dt=DT, file_name):
     plt.imshow(prob_densities, cmap=plt.get_cmap("BuPu"), origin='lower', 
                extent=[-L/2, L/2-DX, dt/2, (num_steps+1/2)*dt], aspect='auto')
     plt.xlabel('$x$ $[\\xi]$')
-    plt.ylabel('t')
+    plt.ylabel('$t$ $[\\xi/c_s]$')
     cbar = plt.colorbar()
     cbar.set_label(r'Density', labelpad=5, fontsize=myfontsize)
     plt.savefig(file_name, dpi=300, bbox_inches='tight')
@@ -225,7 +225,7 @@ def plot_initial_state(nu1,nu2):
 
 def main():
     # Store the created plots here
-    os.system('mkdir -p {}'.format(FIGURE_PATH))
+    os.makedirs(FIGURE_PATH, exist_ok=True)
 
     plot_initial_state(0.,0.5)
 
