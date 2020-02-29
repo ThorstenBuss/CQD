@@ -179,9 +179,9 @@ def propagate_state(psi0, *, num_steps, dt=DT):
 
 def main():
     # Create directories to store data and plots
-    os.system('mkdir -p {}'.format(DATA_PATH))
-    os.system('mkdir -p {}/phase'.format(FIGURE_PATH))
-    os.system('mkdir -p {}/density'.format(FIGURE_PATH))
+    os.makedirs(DATA_PATH, exist_ok=True)
+    os.makedirs(FIGURE_PATH + '/phase', exist_ok=True)
+    os.makedirs(FIGURE_PATH + '/density', exist_ok=True)
 
     # -- Initialization ---------------------------------------
 
